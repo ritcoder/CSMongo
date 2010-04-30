@@ -401,6 +401,229 @@ namespace CSMongo.Query {
 
         #region Updating
 
+        #region PullAll
+        /// <summary>
+        /// removes all occurrences of each value in value_array from field, if field is an array. If field is present but is not an array, an error condition is raised.
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        public void PullAll(string field, object value)
+        {
+            var doc = new BsonDocument();
+            doc[field] = value;
+            PullAll(doc);
+        }
+        /// <summary>
+        /// removes all occurrences of each value in value_array from field, if field is an array. If field is present but is not an array, an error condition is raised.
+        /// </summary>
+        /// <param name="document"></param>
+        public void PullAll(object document)
+        {
+            PullAll(new BsonDocument(document));
+        }
+        /// <summary>
+        /// removes all occurrences of each value in value_array from field, if field is an array. If field is present but is not an array, an error condition is raised.
+        /// </summary>
+        /// <param name="document"></param>
+        public void PullAll(BsonDocument document)
+        {
+            _SendUpdate("$pullAll", UpdateOptionTypes.MultiUpdate, document);
+        }
+
+        #endregion
+
+        #region Pull
+        /// <summary>
+        /// removes all occurrences of value from field, if field is an array. If field is present but is not an array, an error condition is raised.
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        public void Pull(string field, object value)
+        {
+            var doc = new BsonDocument();
+            doc[field] = value;
+            Pull(doc);
+        }
+        /// <summary>
+        /// removes all occurrences of value from field, if field is an array. If field is present but is not an array, an error condition is raised.
+        /// </summary>
+        /// <param name="document"></param>
+        public void Pull(object document)
+        {
+            Pull(new BsonDocument(document));
+        }
+        /// <summary>
+        /// removes all occurrences of value from field, if field is an array. If field is present but is not an array, an error condition is raised.
+        /// </summary>
+        /// <param name="document"></param>
+        public void Pull(BsonDocument document)
+        {
+            _SendUpdate("$pull", UpdateOptionTypes.MultiUpdate, document);
+        }
+
+        #endregion
+
+        #region Add To Set
+        /// <summary>
+        /// Adds value to the array only if its not in the array already.
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        public void AddToSet(string field, object value)
+        {
+            var doc = new BsonDocument();
+            doc[field] = value;
+            AddToSet(doc);
+        }
+        /// <summary>
+        /// Adds value to the array only if its not in the array already.
+        /// </summary>
+        /// <param name="document"></param>
+        public void AddToSet(object document)
+        {
+            AddToSet(new BsonDocument(document));
+        }
+        /// <summary>
+        /// Adds value to the array only if its not in the array already.
+        /// </summary>
+        /// <param name="document"></param>
+        public void AddToSet(BsonDocument document)
+        {
+            _SendUpdate("$addToSet", UpdateOptionTypes.MultiUpdate, document);
+        }
+        #endregion
+
+        #region Add All To Set
+        /// <summary>
+        /// Adds values to the array only if its not in the array already.
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="values"></param>
+        public void AddAllToSet(string field, IEnumerable values)
+        {
+            var innerDoc = new BsonDocument();
+            innerDoc["$each"] = values;
+            var doc = new BsonDocument();
+            doc[field] = innerDoc;
+            AddAllToSet(doc);
+        }
+        /// <summary>
+        /// Adds values to the array only if its not in the array already.
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="values"></param>
+        public void AddAllToSet(string field, params object[] values)
+        {
+            var innerDoc = new BsonDocument();
+            innerDoc["$each"] = values;
+            var doc = new BsonDocument();
+            doc[field] = innerDoc;
+            AddAllToSet(doc);
+        }
+        /// <summary>
+        /// Adds value to the array only if its not in the array already.
+        /// </summary>
+        /// <param name="document"></param>
+        public void AddAllToSet(BsonDocument document)
+        {
+            _SendUpdate("$addToSet", UpdateOptionTypes.MultiUpdate, document);
+        }
+        #endregion
+
+        #region Push
+        /// <summary>
+        /// appends value to field, if field  is an existing array, otherwise sets field to the array [value] if field is not present. If field is present but is not an array, an error condition is raised.
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        public void Push(string field, object value)
+        {
+            var doc = new BsonDocument();
+            doc[field] = value;
+            Push(doc);
+        }
+        /// <summary>
+        /// appends value to field, if field  is an existing array, otherwise sets field to the array [value] if field is not present. If field is present but is not an array, an error condition is raised.
+        /// </summary>
+        /// <param name="document"></param>
+        public void Push(object document)
+        {
+            Push(new BsonDocument(document));
+        }
+        /// <summary>
+        /// appends value to field, if field  is an existing array, otherwise sets field to the array [value] if field is not present. If field is present but is not an array, an error condition is raised.
+        /// </summary>
+        /// <param name="document"></param>
+        public void Push(BsonDocument document)
+        {
+            _SendUpdate("$push", UpdateOptionTypes.MultiUpdate, document);
+        }
+
+        #endregion
+
+        #region PushAll
+        /// <summary>
+        /// appends each value in value_array to field, if field is an existing array, otherwise sets field  to the array value_array if field is not present. If field is present but is not an array, an error condition is raised.
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        public void PushAll(string field, object value)
+        {
+            var doc = new BsonDocument();
+            doc[field] = value;
+            PushAll(doc);
+        }
+        /// <summary>
+        /// appends each value in value_array to field, if field is an existing array, otherwise sets field  to the array value_array if field is not present. If field is present but is not an array, an error condition is raised.
+        /// </summary>
+        /// <param name="document"></param>
+        public void PushAll(object document)
+        {
+            PushAll(new BsonDocument(document));
+        }
+        /// <summary>
+        /// appends each value in value_array to field, if field is an existing array, otherwise sets field  to the array value_array if field is not present. If field is present but is not an array, an error condition is raised.
+        /// </summary>
+        /// <param name="document"></param>
+        public void PushAll(BsonDocument document)
+        {
+            _SendUpdate("$pushAll", UpdateOptionTypes.MultiUpdate, document);
+        }
+        #endregion
+
+        #region Pop
+        /// <summary>
+        /// removes the last element in an array
+        /// </summary>
+        /// <param name="field"></param>
+        public void Pop(string field)
+        {
+            Pop(field, false);
+        }
+        /// <summary>
+        /// Removes all matching fields from each document in the query
+        /// </summary>
+        public void Pop(string field, bool first)
+        {
+            //mark the fields to be removed
+            var remove = new BsonDocument();
+            remove[field] = first ? -1 : 1;
+            //send the command
+            _SendUpdate("$pop", UpdateOptionTypes.MultiUpdate, remove);
+        }
+        #endregion
+
+        /// <summary>
+        /// Updates the matching record with with values provided or adds the new item to the object entirely
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        public void Set(string field,object value)
+        {
+            var doc = new BsonDocument();
+            doc[field] = value;
+            Set(doc);
+        }
         /// <summary>
         /// Updates all matching records with the values on the provided object
         /// or adds the new item to object entirely
@@ -439,8 +662,8 @@ namespace CSMongo.Query {
         public void Increment(params string[] fields) {
             
             //create the document
-            BsonDocument document = new BsonDocument();
-            foreach (string field in fields) {
+            BsonDocument document = new BsonDocument{UseRawFieldNames = true};
+            foreach (var field in fields) {
                 document.Set<int>(field, 1);
             }
 
