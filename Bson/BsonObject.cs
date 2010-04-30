@@ -40,7 +40,10 @@ namespace CSMongo.Bson {
         #endregion
 
         #region Properties
-
+        /// <summary>
+        /// Gets or sets if all field names passes should be used the way they are or if they should be split using the .
+        /// </summary>
+        public bool UseRawFieldNames { get; set; }
         /// <summary>
         /// Gets or sets if this dynamic object cares about properties
         /// being in the right case or not
@@ -369,9 +372,11 @@ namespace CSMongo.Bson {
             };
 
             //split the values (if any)
-            string[] parts = Regex.Split(field, @"\.");
-            foreach (string part in parts) {
-                bool last = parts.Last().Equals(part, this._GetCaseComparison());
+            var parts = (field.StartsWith("@") || UseRawFieldNames)
+                            ? new[] {UseRawFieldNames ? field : field.Substring(1)}
+                            : Regex.Split(field, @"\.");
+            foreach (var part in parts) {
+                var last = parts.Last().Equals(part, _GetCaseComparison());
 
                 //start by trying to find the result
                 container.Name = part;
