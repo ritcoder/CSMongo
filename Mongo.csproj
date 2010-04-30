@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{9D735EF9-E082-4646-A0C5-E794074BAA8B}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -131,6 +131,9 @@
     <Compile Include="Types\OpCodeTypes.cs" />
     <Compile Include="Types\QueryOptionTypes.cs" />
     <Compile Include="Types\UpdateOptionTypes.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="observations+actions.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
