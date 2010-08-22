@@ -1,0 +1,3548 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CSMongo</name>
+    </assembly>
+    <members>
+        <member name="T:CSMongo.Responses.QueryResponse">
+            <summary>
+            Records and details of the result of a QueryRequest
+            </summary>
+        </member>
+        <member name="T:CSMongo.Responses.ResponseBase">
+            <summary>
+            A response from a request to the database. No need to 
+            make changes or act with the stream in the constructor
+            since the abstract method ParseStream handles that
+            </summary>
+        </member>
+        <member name="F:CSMongo.Responses.ResponseBase.ResultOk">
+            <summary>
+            Response from the server meaning a request completed successfully
+            </summary>
+        </member>
+        <member name="M:CSMongo.Responses.ResponseBase.#ctor(System.IO.Stream)">
+            <summary>
+            Creates a new response by reading the standard Mongo header stream
+            </summary>
+        </member>
+        <member name="M:CSMongo.Responses.ResponseBase.ParseStream(System.IO.Stream)">
+            <summary>
+            Required function for reading incoming content
+            </summary>
+        </member>
+        <member name="P:CSMongo.Responses.ResponseBase.Length">
+            <summary>
+            The length of the response message
+            </summary>
+        </member>
+        <member name="P:CSMongo.Responses.ResponseBase.RequestId">
+            <summary>
+            The id of this current request
+            </summary>
+        </member>
+        <member name="P:CSMongo.Responses.ResponseBase.ResponseTo">
+            <summary>
+            The id of the request that sent the query
+            </summary>
+        </member>
+        <member name="P:CSMongo.Responses.ResponseBase.OpCode">
+            <summary>
+            The code that was returned from the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.Responses.QueryResponse.#ctor(System.IO.Stream)">
+            <summary>
+            Creates a new QueryResponse using an incoming stream
+            </summary>
+        </member>
+        <member name="M:CSMongo.Responses.QueryResponse.ParseStream(System.IO.Stream)">
+            <summary>
+            Handles reading back the content for this query
+            </summary>
+        </member>
+        <member name="M:CSMongo.Responses.QueryResponse.CheckForExceptions">
+            <summary>
+            Checks for a default response if there is an error
+            </summary>
+        </member>
+        <member name="M:CSMongo.Responses.QueryResponse.GetDefaultResponse">
+            <summary>
+            Finds a response or returns an empty object
+            </summary>
+        </member>
+        <member name="P:CSMongo.Responses.QueryResponse.CursorId">
+            <summary>
+            The cursor returned from this response
+            </summary>
+        </member>
+        <member name="P:CSMongo.Responses.QueryResponse.Flag">
+            <summary>
+            Not sure what this does yet
+            </summary>
+        </member>
+        <member name="P:CSMongo.Responses.QueryResponse.StartingFrom">
+            <summary>
+            The starting point for the returned records
+            </summary>
+        </member>
+        <member name="P:CSMongo.Responses.QueryResponse.TotalReturned">
+            <summary>
+            Total records returned to use
+            </summary>
+        </member>
+        <member name="P:CSMongo.Responses.QueryResponse.Documents">
+            <summary>
+            The documents found from the query
+            </summary>
+        </member>
+        <member name="P:CSMongo.Responses.QueryResponse.HasDocuments">
+            <summary>
+            Returns if there are documents to use after a response
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.GetOpTimeResult">
+            <summary>
+            Returns the OpTime result from the database
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.MethodResult">
+            <summary>
+            A general response after calling a Mongo database command
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.MethodResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            Creates a new MethodResult from the provided document
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.MethodResult.HasResponse">
+            <summary>
+            Returns if this method actually returned a result or not
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.MethodResult.Response">
+            <summary>
+            The documents this response is based on
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.MethodResult.Ok">
+            <summary>
+            Returns if the response has an OK value
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.GetOpTimeResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            The information returned when calling the FSync command
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.GetOpTimeResult.Timestamp">
+            <summary>
+            Returns the number of files after the FSync command
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.GetOpTimeResult.TotalTime">
+            <summary>
+            Returns the total time based on the timestamp
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.AssertInfoResult">
+            <summary>
+            Information related to assertions by the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.AssertInfoResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            Creates a new container for an AssertInfo response
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.AssertInfoResult.WasDatabaseAsserted">
+            <summary>
+            The actual expression used for the assertion
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.AssertInfoResult.WasAsserted">
+            <summary>
+            The actual expression used for the assertion
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.AssertInfoResult.Assert">
+            <summary>
+            The actual expression used for the assertion
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.AssertInfoResult.AssertW">
+            <summary>
+            Unknown functionality
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.AssertInfoResult.Message">
+            <summary>
+            Returns a message related to this request
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.AssertInfoResult.User">
+            <summary>
+            Returns user information for the assertion
+            </summary>
+        </member>
+        <member name="T:CSMongo.DataTypes.MongoObjectType">
+            <summary>
+            Handles working with unknown types, mostly via serialization
+            </summary>
+        </member>
+        <member name="T:CSMongo.DataTypes.MongoDataType">
+            <summary>
+            Base type for other defined Mongo types
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDataType.Set``1(``0)">
+            <summary>
+            Handles assigning a value to a field
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDataType.Get``1">
+            <summary>
+            Handles returning a value in the requested type
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDataType.ConvertValue``1(System.Object)">
+            <summary>
+            Handles converting the passed in value to the base 
+            type for this Mongo object
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDataType.GetDataType">
+            <summary>
+            Used to determine the Mongo Op code for this type
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDataType.IsAllowedValue``1(``0)">
+            <summary>
+            Determines if this type can be cast into the requested type
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDataType.ToBson">
+            <summary>
+            Writes a value to BSON format
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDataType.FromBsonStream(System.IO.Stream)">
+            <summary>
+            Handles reading the content to find the value of an object
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDataType.FindTypeFor(System.Object)">
+            <summary>
+            Handles finding the correct data type for a value
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDataType.RegisterMongoDataType``1">
+            <summary>
+            Registers a new MongoData type to use with the 
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDataType.UnregisterMongoDataType``1">
+            <summary>
+            Unregisters a type from the MongoData
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDataType.IsTypeRegistered``1">
+            <summary>
+            Returns if any of the current registered types matches the incoming type
+            </summary>
+        </member>
+        <member name="P:CSMongo.DataTypes.MongoDataType.Value">
+            <summary>
+            The current value of this field
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoObjectType.GetDataType">
+            <summary>
+            Returns the Mongo type for this data
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoObjectType.IsAllowedValue``1(``0)">
+            <summary>
+            Catches generic objects and coverts them into DynamicObjects
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoObjectType.ToBson">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:CSMongo.Mongo">
+            <summary>
+            Default properties and values for Mongo
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.DefaultTakeCount">
+            <summary>
+            The default number to use when creating a query for the take value
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.DefaultSkipCount">
+            <summary>
+            The default number to use when creating a query for the skip value
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.DocumentIdKey">
+            <summary>
+            The default ID value used for ObjectIds with a Mongo Document
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.Null">
+            <summary>
+            Null value to use when creating new anonymous types
+            since you can't assign null directly
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.Epoch">
+            <summary>
+            The starting value to use when calculating dates
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.CommandArgument">
+            <summary>
+            The number that most commands use as the value for the 
+            name of the method that is being run in on the server
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.DefaultPort">
+            <summary>
+            The default port that Mongo uses for database connections
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.DefaultAdminDatabase">
+            <summary>
+            The name of the Mongo database to default to 
+            </summary>
+        </member>
+        <member name="P:CSMongo.Mongo.DefaultGetMoreReturnCount">
+            <summary>
+            The default number of records to return on a GetMore
+            request if no count is provided and cannot be determined
+            from the previous request
+            </summary>
+        </member>
+        <member name="T:CSMongo.DataTypes.SmallEnumeratedType">
+            <summary>
+            Handles working with small enumerated value types
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.SmallEnumeratedType.GetDataType">
+            <summary>
+            Returns the correct data type to store this value
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.SmallEnumeratedType.IsAllowedValue``1(``0)">
+            <summary>
+            Determines if the value provided can be used 
+            for this value
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.SmallEnumeratedType.Get``1">
+            <summary>
+            Handles getting the current value for this field
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.SmallEnumeratedType.Set``1(``0)">
+            <summary>
+            Converts the enumerated value to a safe level
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.SmallEnumeratedType.ConvertValue``1(System.Object)">
+            <summary>
+            Performs any conversions for a number
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.SmallEnumeratedType.ToBson">
+            <summary>
+            Converts the value into an appropriate byte value
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.SmallEnumeratedType.FromBsonStream(System.IO.Stream)">
+            <summary>
+            Reads the value from an incoming stream
+            </summary>
+        </member>
+        <member name="T:CSMongo.Exceptions.MongoDeserializationException">
+            <summary>
+            Thrown when a type cannot be deserialized into an expected type
+            </summary>
+        </member>
+        <member name="M:CSMongo.Exceptions.MongoDeserializationException.#ctor(System.Exception)">
+            <summary>
+            Throws that deserialization failed for the type requested
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.CollectionStatsResult">
+            <summary>
+            Details about a collection in the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.CollectionStatsResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            Creates details about the stats for a collection
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.CollectionStatsResult.FullName">
+            <summary>
+            Returns the full name of the collection
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.CollectionStatsResult.DocumentCount">
+            <summary>
+            The number of documents in the collection
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.CollectionStatsResult.Size">
+            <summary>
+            The current size of the collection
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.CollectionStatsResult.StorageSize">
+            <summary>
+            The size of the collection per storage
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.CollectionStatsResult.IndexCount">
+            <summary>
+            Returns the number of indexes in the collection
+            </summary>
+        </member>
+        <member name="T:CSMongo.DataTypes.MongoOidType">
+            <summary>
+            Handles working with Oid values
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoOidType.GetDataType">
+            <summary>
+            Returns the correct datatype to use
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoOidType.IsAllowedValue``1(``0)">
+            <summary>
+            Returns if the value is allowed to be used
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoOidType.ConvertValue``1(System.Object)">
+            <summary>
+            No conversions available for this type
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoOidType.ToBson">
+            <summary>
+            Generates the bytes for this container
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoOidType.FromBsonStream(System.IO.Stream)">
+            <summary>
+            Handles reading an Oid from an incoming stream
+            </summary>
+        </member>
+        <member name="T:CSMongo.DataTypes.MongoNumberType">
+            <summary>
+            Represents a Number within Mongo an any acceptable types
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoNumberType.GetDataType">
+            <summary>
+            Returns the Mongo type for this data
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoNumberType.IsAllowedValue``1(``0)">
+            <summary>
+            Returns if the value passed in is allowed to be used
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoNumberType.Set``1(``0)">
+            <summary>
+            Sets the current value of this MongoNumber
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoNumberType.ToBson">
+            <summary>
+            Converts this value into a series of BSON bytes
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoNumberType.FromBsonStream(System.IO.Stream)">
+            <summary>
+            Reads the value from a stream
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.GetNonceResult">
+            <summary>
+            The result when getting a nonce value for a database login
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.GetNonceResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            The information returned when calling the FSync command
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.GetNonceResult.Nonce">
+            <summary>
+            Returns the nonce found in the response
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.GetNonceResult.HasNonce">
+            <summary>
+            Returns if a nonce was actually found in the response
+            </summary>
+        </member>
+        <member name="T:CSMongo.DataTypes.MongoStringType">
+            <summary>
+            Handles assigning a value for 
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoStringType.GetDataType">
+            <summary>
+            Returns the Mongo type for this data
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoStringType.IsAllowedValue``1(``0)">
+            <summary>
+            Returns if the type requested can be assigned to this type
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoStringType.ToBson">
+            <summary>
+            Handles converting the value to a BSON format
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoStringType.FromBsonStream(System.IO.Stream)">
+            <summary>
+            Handles reading a string value from an incoming stream
+            </summary>
+        </member>
+        <member name="T:CSMongo.DataTypes.MongoArrayType">
+            <summary>
+            Handles array value types
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoArrayType.GetDataType">
+            <summary>
+            Returns the Mongo type for this data
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoArrayType.IsAllowedValue``1(``0)">
+            <summary>
+            Allows for collection based values regarless of content
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoArrayType.Set``1(``0)">
+            <summary>
+            Saves the value of an array for this type
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoArrayType.ToBson">
+            <summary>
+            Return the bytes as an array value
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoArrayType.FromBsonStream(System.IO.Stream)">
+            <summary>
+            Reads array content from the incoming stream
+            </summary>
+        </member>
+        <member name="T:CSMongo.Requests.DeleteRequest">
+            <summary>
+            Handles inserting content into a database
+            </summary>
+        </member>
+        <member name="T:CSMongo.Requests.CollectionRequestBase">
+            <summary>
+            Default class for requests that will be targeted at a collection
+            </summary>
+        </member>
+        <member name="T:CSMongo.Requests.RequestBase">
+            <summary>
+            Base class for making requests to the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.RequestBase.#ctor(CSMongo.Types.OpCodeTypes)">
+            <summary>
+            Creates a new request for the specified type
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.RequestBase.Reset">
+            <summary>
+            Resets the bytes for this request
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.RequestBase.GetHeader">
+            <summary>
+            Returns the bytes to send as a header for this request
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.RequestBase.GetBody">
+            <summary>
+            Returns the bytes that should be sent as a header
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.RequestBase.GenerateBody(CSMongo.IO.DynamicStream)">
+            <summary>
+            Required function to generate the content for sending
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.RequestBase.OnBeforeGenerateStream">
+            <summary>
+            Optional functionality to perform before generating 
+            the stream content
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.RequestBase.RequestLength">
+            <summary>
+            Gets the current length of this request
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.RequestBase.OpCode">
+            <summary>
+            Returns the OpCode used for this request
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.RequestBase.RequestId">
+            <summary>
+            The current RequestId for this 
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.RequestBase.ResponseId">
+            <summary>
+            The curretn ResponseID for this request
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.CollectionRequestBase.#ctor(CSMongo.Types.OpCodeTypes,CSMongo.MongoCollection)">
+            <summary>
+            Creates a request targeting a collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.CollectionRequestBase.#ctor(CSMongo.Types.OpCodeTypes,System.String,System.String)">
+            <summary>
+            Creates a request targeting a collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.CollectionRequestBase.GetDatabaseTarget">
+            <summary>
+            Returns the full string name for the database target
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.CollectionRequestBase.Collection">
+            <summary>
+            The target collection for this request
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.CollectionRequestBase.Database">
+            <summary>
+            The target database for this request
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.DeleteRequest.#ctor(CSMongo.MongoCollection)">
+            <summary>
+            Creates an empty delete request
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.DeleteRequest.GenerateBody(CSMongo.IO.DynamicStream)">
+            <summary>
+            Prepares the body of the request to send to the server
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.DeleteRequest.Parameters">
+            <summary>
+            The query filter information to use
+            </summary>
+        </member>
+        <member name="T:CSMongo.Requests.ServerSideCodeRequestBase">
+            <summary>
+            Base class for sending non-query commands to the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.ServerSideCodeRequestBase.#ctor(System.String,System.String)">
+            <summary>
+            Creates a new CommandRequest for the target database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.ServerSideCodeRequestBase.GenerateBody(CSMongo.IO.DynamicStream)">
+            <summary>
+            Generates the command to send to the server
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.ServerSideCodeRequestBase.Arguments">
+            <summary>
+            Arguments to include as part of the command
+            </summary>
+        </member>
+        <member name="T:CSMongo.Bson.BsonObject">
+            <summary>
+            Class for working with an unknown object and values
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.#ctor">
+            <summary>
+            Creates an empty DynamicObject
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.#ctor(System.Object)">
+            <summary>
+            Creates a new DynamicObject using the provided type as a template
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Get``1(``0)">
+            <summary>
+            Uses an anonymous type as a template for the values to return
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Get(System.String)">
+            <summary>
+            Handles getting the value from this DynamicCObject
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Get``1(System.String)">
+            <summary>
+            Handles getting the value from this DynamicCObject
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Get``1(System.String,``0)">
+            <summary>
+            Handles getting the value from this DynamicCObject
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Set(System.String,System.Object)">
+            <summary>
+            Handles assigning an object to the DynamicObject
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Set``1(System.String,``0)">
+            <summary>
+            Handles assigning an object to the DynamicObject
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Has(System.String)">
+            <summary>
+            Returns if a field has a value of the specified type
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Has``1(System.String)">
+            <summary>
+            Returns if a field has a value of the specified type
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Serialize``1(System.String,``0)">
+            <summary>
+            Serializes an object into a byte array
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Serialize``1(System.String,``0,System.Func{``0,System.Byte[]})">
+            <summary>
+            Serializes an object into a byte array
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.MoveToStart(System.String)">
+            <summary>
+            Moves a field to the front of the document
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.MoveToEnd(System.String)">
+            <summary>
+            Moves a field to the end of the document
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.op_Addition(CSMongo.Bson.BsonObject,System.Object)">
+            <summary>
+            Merges another object with this object - Same as calling Merge
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.op_Addition(CSMongo.Bson.BsonObject,CSMongo.Bson.BsonObject)">
+            <summary>
+            Merges another DynamicObject with this object - Same as calling Merge
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.op_Subtraction(CSMongo.Bson.BsonObject,System.String)">
+            <summary>
+            Removes the field provided - Same as calling Remove
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.op_Subtraction(CSMongo.Bson.BsonObject,System.String[])">
+            <summary>
+            Removes the field provided - Same as calling Remove
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Merge``1(``0)">
+            <summary>
+            Merges this object with the provided object
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Merge(CSMongo.MongoDocument)">
+            <summary>
+            Merges this object with the provided DynamicObject
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Merge(CSMongo.Bson.BsonDocument)">
+            <summary>
+            Merges this object with the provided DynamicObject
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Merge(CSMongo.Bson.BsonObject)">
+            <summary>
+            Merges this object with the provided DynamicObject
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Merge(System.Collections.Generic.Dictionary{System.String,System.Object})">
+            <summary>
+            Merges this object with the provided DynamicObject
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Remove(System.String)">
+            <summary>
+            Removes the field provided
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Remove(System.String[])">
+            <summary>
+            Removes each of the fields provided
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Serialize(System.Object)">
+            <summary>
+            Serializes an object into a byte array
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Serialize(System.Object,System.Func{System.Object,System.Byte[]})">
+            <summary>
+            Handles serializing an object quickly
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Deserialize(System.Byte[])">
+            <summary>
+            Serializes an object into a byte array
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.Deserialize(System.Byte[],System.Func{System.Byte[],System.Object})">
+            <summary>
+            Handles serializing an object quickly
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.GetValues">
+            <summary>
+            Returns all of the values in this document 
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.GetRemovedFields">
+            <summary>
+            Returns a list of identities of removed fields
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.OnBeforeFinishBsonRender(System.Collections.Generic.IEnumerable{CSMongo.Bson.BsonFieldDetail})">
+            <summary>
+            Method used to allow reordering of fields before rendering 
+            the final byte array when calling ToBsonByteArray
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.ToBsonByteArray">
+            <summary>
+            Generates the object within this collection as 
+            an array of BSON bytes
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.GetObjectHash">
+            <summary>
+            Returns a hash value of the contents of this object
+            to determine when the object has been changed
+            </summary>
+        </member>
+        <member name="P:CSMongo.Bson.BsonObject.UseRawFieldNames">
+            <summary>
+            Gets or sets if all field names passes should be used the way they are or if they should be split using the .
+            </summary>
+        </member>
+        <member name="P:CSMongo.Bson.BsonObject.IgnoreNulls">
+            <summary>
+            Gets or set if nulls will be ignored when populating the fields with values
+            </summary>
+        </member>
+        <member name="P:CSMongo.Bson.BsonObject.IgnoreCase">
+            <summary>
+            Gets or sets if this dynamic object cares about properties
+            being in the right case or not
+            </summary>
+        </member>
+        <member name="P:CSMongo.Bson.BsonObject.FieldCount">
+            <summary>
+            Returns the total number of fields inside of this object
+            </summary>
+        </member>
+        <member name="P:CSMongo.Bson.BsonObject.Item(System.String)">
+            <summary>
+            Assigns or gets the value of a field on this object
+            </summary>
+        </member>
+        <member name="T:CSMongo.MongoAdminDatabase">
+            <summary>
+            Creates a connection to the administrative database for the Mongo instance
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.#ctor(System.String)">
+            <summary>
+            Creates access to the admin database using the provided information
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.#ctor(System.String,System.Boolean)">
+            <summary>
+            Creates access to the admin database using the provided information
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.#ctor(System.String,System.Int32)">
+            <summary>
+            Creates access to the admin database using the provided information
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.#ctor(System.String,System.Int32,System.Boolean)">
+            <summary>
+            Creates access to the admin database using the provided information
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Creates access to the admin database using the provided information
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.#ctor(System.String,System.Int32,System.String,System.String,System.Boolean)">
+            <summary>
+            Creates access to the admin database using the provided information
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.Logout">
+            <summary>
+            Sends the log out request to the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.CheckOpLogging">
+            <summary>
+            Checks the status of the database for the oplogging value
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.GetBuildInfo">
+            <summary>
+            Returns the build info for the current database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.GetDatabases">
+            <summary>
+            Gets a list of all databases available
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.FSync">
+            <summary>
+            Performs an FSync command against the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.FSync(System.Boolean)">
+            <summary>
+            Performs an FSync command against the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.CopyDatabase(System.String,System.String)">
+            <summary>
+            Handles copying a database to another location
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.CopyDatabase(System.String,System.String,System.String)">
+            <summary>
+            Handles copying a database to another location
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.CopyDatabase(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Handles copying a database to another location
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.CopyDatabase(System.String,System.String,System.String,System.Int32,System.String,System.String)">
+            <summary>
+            Handles copying a database to another location
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.Shutdown">
+            <summary>
+            Sends the shutdown signal to the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.ResetErrors">
+            <summary>
+            Clears any errors from the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.GetLastError">
+            <summary>
+            Returns the most recent error from the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.GetPreviousError">
+            <summary>
+            Returns a previous error message from the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.ForceError">
+            <summary>
+            Causes an error on the server -- Uh... wut?
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.GetOpTime">
+            <summary>
+            Returns the OpTime value from the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.RunCommand(System.Object)">
+            <summary>
+            Manually invokes a command against the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.RunCommand(System.Object,System.Boolean)">
+            <summary>
+            Manually invokes a command against the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.RunCommand(CSMongo.Bson.BsonObject)">
+            <summary>
+            Manually invokes a command against the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.RunCommand(CSMongo.Bson.BsonObject,System.Boolean)">
+            <summary>
+            Manually invokes a command against the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoAdminDatabase.Dispose">
+            <summary>
+            Handles cleaning up this database connection
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoAdminDatabase.Connection">
+            <summary>
+            Returns the connection managing this database
+            </summary>
+        </member>
+        <member name="T:CSMongo.Types.QueryOptionTypes">
+            <summary>
+            Options available when performing a query
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.GetPreviousErrorResult">
+            <summary>
+            Returns about a previous error on the server
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.GetLastErrorResult">
+            <summary>
+            Returns details about the last error in the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.GetLastErrorResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            Creates a container for the last error message found
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.GetLastErrorResult.Error">
+            <summary>
+            Returns information about the system that is hosting the database
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.GetLastErrorResult.NumberOfErrors">
+            <summary>
+            Returns the total count of errors found on the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.GetPreviousErrorResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            Creates a container for the last error message found
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.GetPreviousErrorResult.NumberOfOperationsAgo">
+            <summary>
+            Returns the operation count that has passed since this error
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.BuildInfoResult">
+            <summary>
+            Returns details about the current build information for the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.BuildInfoResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            Creates a new BuildInfo result from the provided document
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.BuildInfoResult.GitVersion">
+            <summary>
+            Returns the Git version of this Mongo database
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.BuildInfoResult.Version">
+            <summary>
+            Returns the version number for this database
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.BuildInfoResult.SystemInformation">
+            <summary>
+            Returns information about the system that is hosting the database
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.BuildInfoResult.Bits">
+            <summary>
+            Returns the current bit level the system is running at
+            </summary>
+        </member>
+        <member name="T:CSMongo.DataTypes.MongoInt32Type">
+            <summary>
+            Handles integer values for Mongo
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoInt32Type.GetDataType">
+            <summary>
+            Returns the Mongo type for this data
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoInt32Type.IsAllowedValue``1(``0)">
+            <summary>
+            Returns if the value passed in is allowed to be used
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoInt32Type.Set``1(``0)">
+            <summary>
+            Sets the current value of this MongoNumber
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoInt32Type.ConvertValue``1(System.Object)">
+            <summary>
+            Handles converting the value into an appropriate type
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoInt32Type.ToBson">
+            <summary>
+            Converts this value into a series of BSON bytes
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoInt32Type.FromBsonStream(System.IO.Stream)">
+            <summary>
+            Reads the value from a stream
+            </summary>
+        </member>
+        <member name="T:CSMongo.Requests.KillCursorsRequest">
+            <summary>
+            Sends the request to remove the provided cursors
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.KillCursorsRequest.#ctor(System.Collections.Generic.IEnumerable{System.Int64})">
+            <summary>
+            Creates a new KillCursor command for the cursors provided
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.KillCursorsRequest.GenerateBody(CSMongo.IO.DynamicStream)">
+            <summary>
+            Generates the body of this request
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.KillCursorsRequest.Cursors">
+            <summary>
+            A list of the Cursors to kill
+            </summary>
+        </member>
+        <member name="T:CSMongo.Requests.CommandRequest">
+            <summary>
+            Starts a new request to execute a command
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.CommandRequest.#ctor(CSMongo.MongoDatabase)">
+            <summary>
+            Creates a new CommandRequest for the specified database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.CommandRequest.#ctor(System.String)">
+            <summary>
+            Creates a new CommandRequest for the specified database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.CommandRequest.OnResponse(System.IO.Stream)">
+            <summary>
+            Reads the response from the server
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.CommandRequest.ExpectResponse">
+            <summary>
+            Does this request expect a response from the server
+            </summary>
+        </member>
+        <member name="T:CSMongo.Bson.BsonOrderedDocument">
+            <summary>
+            A document that reorders values based on size
+            </summary>
+        </member>
+        <member name="T:CSMongo.Bson.BsonDocument">
+            <summary>
+            Creates a BSON document where the field order is managed
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonDocument.#ctor">
+            <summary>
+            Creates a new empty BSON document
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonDocument.#ctor(System.Object)">
+            <summary>
+            Creates a new BSON document based on the source provided
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonDocument.op_Addition(CSMongo.Bson.BsonDocument,System.Object)">
+            <summary>
+            Merges another object with this object - Same as calling Merge
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonDocument.op_Addition(CSMongo.Bson.BsonDocument,CSMongo.Bson.BsonObject)">
+            <summary>
+            Merges another DynamicObject with this object - Same as calling Merge
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonDocument.op_Subtraction(CSMongo.Bson.BsonDocument,System.String)">
+            <summary>
+            Removes the field provided - Same as calling Remove
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonDocument.op_Subtraction(CSMongo.Bson.BsonDocument,System.String[])">
+            <summary>
+            Removes the field provided - Same as calling Remove
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonDocument.ToBsonByteArray">
+            <summary>
+            Renders the bytes required to create a document
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonDocument.FromStream(System.IO.Stream)">
+            <summary>
+            Reads an incoming BSON document from a stream
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonOrderedDocument.#ctor">
+            <summary>
+            Creates a new empty BSON document
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonOrderedDocument.#ctor(System.Object)">
+            <summary>
+            Creates a new BSON document based on the source provided
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonOrderedDocument.op_Addition(CSMongo.Bson.BsonOrderedDocument,System.Object)">
+            <summary>
+            Merges another object with this object - Same as calling Merge
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonOrderedDocument.op_Addition(CSMongo.Bson.BsonOrderedDocument,CSMongo.Bson.BsonObject)">
+            <summary>
+            Merges another DynamicObject with this object - Same as calling Merge
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonOrderedDocument.op_Subtraction(CSMongo.Bson.BsonOrderedDocument,System.String)">
+            <summary>
+            Removes the field provided - Same as calling Remove
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonOrderedDocument.op_Subtraction(CSMongo.Bson.BsonOrderedDocument,System.String[])">
+            <summary>
+            Removes the field provided - Same as calling Remove
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonOrderedDocument.OnBeforeFinishBsonRender(System.Collections.Generic.IEnumerable{CSMongo.Bson.BsonFieldDetail})">
+            <summary>
+            Reorders the bytes into the same order as their length
+            </summary>
+        </member>
+        <member name="T:CSMongo.Exceptions.MongoServerException">
+            <summary>
+            Exception thrown when the server returns an error
+            </summary>
+        </member>
+        <member name="M:CSMongo.Exceptions.MongoServerException.#ctor(System.String)">
+            <summary>
+            Throws a new exception for when the Mongo server has an error
+            </summary>
+        </member>
+        <member name="T:CSMongo.MongoDocument">
+            <summary>
+            A document to use for storage with a MongoDatabase
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDocument.#ctor">
+            <summary>
+            Creates an empty MongoDocument with a default ID assigned
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDocument.#ctor(System.Object)">
+            <summary>
+            Creates an empty MongoDocument with a default ID assigned
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDocument.#ctor(System.Boolean)">
+            <summary>
+            Creates an empty MongoDocument with a default ID assigned
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDocument.#ctor(System.Boolean,System.Object)">
+            <summary>
+            Creates a MongoDocument using the provided object as a template
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDocument.op_Addition(CSMongo.MongoDocument,System.Object)">
+            <summary>
+            Merges another object with this object - Same as calling Merge
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDocument.op_Addition(CSMongo.MongoDocument,CSMongo.Bson.BsonObject)">
+            <summary>
+            Merges another DynamicObject with this object - Same as calling Merge
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDocument.op_Subtraction(CSMongo.MongoDocument,System.String)">
+            <summary>
+            Removes the field provided - Same as calling Remove
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDocument.op_Subtraction(CSMongo.MongoDocument,System.String[])">
+            <summary>
+            Removes the field provided - Same as calling Remove
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDocument.GenerateId">
+            <summary>
+            Creates an Oid for this document - MongoDB will 
+            automatically create an Oid when needed
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDocument.OnBeforeFinishBsonRender(System.Collections.Generic.IEnumerable{CSMongo.Bson.BsonFieldDetail})">
+            <summary>
+            Handles reordering so that the Oid is at the start
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDocument.ToBsonByteArray">
+            <summary>
+            Handles rendering the bytes required to create this type
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:CSMongo.MongoDocument.Id">
+            <summary>
+            The Oid for a document (if any)
+            </summary>
+        </member>
+        <member name="T:CSMongo.MongoConnection">
+            <summary>
+            Creates a new connection to a Mongo database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoConnection.#ctor(System.String)">
+            <summary>
+            Creates a new Mongo connection
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoConnection.#ctor(System.String,System.Boolean)">
+            <summary>
+            Creates a new Mongo connection
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoConnection.#ctor(System.String,System.Int32)">
+            <summary>
+            Creates a new Mongo connection
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoConnection.#ctor(System.String,System.Int32,System.Boolean)">
+            <summary>
+            Creates a new Mongo connection
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoConnection.Open">
+            <summary>
+            Opens the connection to the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoConnection.Close">
+            <summary>
+            Handles disconnecting from the client
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoConnection.SendRequest(CSMongo.Requests.RequestBase)">
+            <summary>
+            Sends a request to the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoConnection.Dispose">
+            <summary>
+            Handles disconnecting and disposing a connection
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoConnection.Port">
+            <summary>
+            Gets or sets the port to connect on
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoConnection.Host">
+            <summary>
+            Gets or sets the host to connect to
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoConnection.AutoConnect">
+            <summary>
+            Gets or sets if this connection should automatically open
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoConnection.Connected">
+            <summary>
+            Returns of this connection is currently open or not
+            </summary>
+        </member>
+        <member name="E:CSMongo.MongoConnection.BeforeConnectionOpened">
+            <summary>
+            Event raised just before the database is closed
+            </summary>
+        </member>
+        <member name="E:CSMongo.MongoConnection.AfterConnectionOpen">
+            <summary>
+            Event raised when right after the database is closed
+            </summary>
+        </member>
+        <member name="E:CSMongo.MongoConnection.BeforeConnectionClosed">
+            <summary>
+            Event raised just before the database is closed
+            </summary>
+        </member>
+        <member name="E:CSMongo.MongoConnection.AfterConnectionClosed">
+            <summary>
+            Event raised when right after the database is closed
+            </summary>
+        </member>
+        <member name="T:CSMongo.DataTypes.MongoInt64Type">
+            <summary>
+            Default class to handle long int values
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoInt64Type.GetDataType">
+            <summary>
+            Returns the Mongo type for this data
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoInt64Type.IsAllowedValue``1(``0)">
+            <summary>
+            Returns if the value passed in is allowed to be used
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoInt64Type.ConvertValue``1(System.Object)">
+            <summary>
+            Handles converting the value into an appropriate type
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoInt64Type.Set``1(``0)">
+            <summary>
+            Sets the current value of this MongoNumber
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoInt64Type.ToBson">
+            <summary>
+            Converts this value into a series of BSON bytes
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoInt64Type.FromBsonStream(System.IO.Stream)">
+            <summary>
+            Reads the value from a stream
+            </summary>
+        </member>
+        <member name="T:CSMongo.Query.MongoQuery">
+            <summary>
+            Handles building a query and generating records
+            </summary>
+        </member>
+        <member name="T:CSMongo.Query.MongoQueryBase">
+            <summary>
+            Base type to use for custom Query providers
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQueryBase.#ctor(CSMongo.MongoDatabase,System.String)">
+            <summary>
+            Creates a new query for the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQueryBase.#ctor(CSMongo.MongoCollection)">
+            <summary>
+            Creates a new query for the database
+            </summary>
+        </member>
+        <member name="P:CSMongo.Query.MongoQueryBase.Collection">
+            <summary>
+            The collection that is being queried
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.#ctor(CSMongo.MongoCollection)">
+            <summary>
+            Creates a new query for this database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.#ctor(CSMongo.MongoDatabase,System.String)">
+            <summary>
+            Creates a new query for this database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.AppendParameter(System.String,System.String,System.Object)">
+            <summary>
+            Allows you to append a query option using the Mongo syntax 
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Where(System.String)">
+            <summary>
+            Writes a manual function to persom a comparison on the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Where(System.String,System.Boolean)">
+            <summary>
+            Writes a manual function to perform a comparison on the server 
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Match(System.String,System.Text.RegularExpressions.Regex)">
+            <summary>
+            Finds all records that match the provided expression
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Match(System.String,System.String)">
+            <summary>
+            Finds all records that match the provided expression
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Match(System.String,System.String,System.Text.RegularExpressions.RegexOptions)">
+            <summary>
+            Finds all records that match the provided expression
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.EqualTo(System.String,System.Object)">
+            <summary>
+            Finds all records that are equal to the value provided
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.FindById(System.String)">
+            <summary>
+            Finds a record based on the Oid value
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.FindById(System.Byte[])">
+            <summary>
+            Finds a record based on the Oid value
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.FindById(CSMongo.MongoOid)">
+            <summary>
+            Finds a record based on the Oid value
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.NotEqualTo(System.String,System.Object)">
+            <summary>
+            Finds all records that are not equal to the value provided
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.GreaterOrEqual(System.String,System.Object)">
+            <summary>
+            Finds all records greater than or equal to the provided value
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Greater(System.String,System.Object)">
+            <summary>
+            Finds all records greater than the provided value
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.LessOrEqual(System.String,System.Object)">
+            <summary>
+            Finds all records less than or equal to the provided value
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Less(System.String,System.Object)">
+            <summary>
+            Finds all records less than the provided value
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Exists(System.String)">
+            <summary>
+            Finds records that the requested field exists in
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.NotExists(System.String)">
+            <summary>
+            Finds records that the requested field does not exist in
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.In(System.String,System.Collections.IEnumerable)">
+            <summary>
+            Finds fields that match any value within the record
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.In(System.String,System.Object[])">
+            <summary>
+            Finds fields that match any value within the record
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.NotIn(System.String,System.Collections.IEnumerable)">
+            <summary>
+            Finds fields that haven't any matches within the collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.NotIn(System.String,System.Object[])">
+            <summary>
+            Finds fields that haven't any matches within the array
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Size(System.String,System.Int32)">
+            <summary>
+            Finds fields that match all value within the record
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.All(System.String,System.Collections.IEnumerable)">
+            <summary>
+            Finds fields that match all value within the record
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.All(System.String,System.Object[])">
+            <summary>
+            Finds fields that match all value within the record
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Mod(System.String,System.Int32)">
+            <summary>
+            Performs a modulo comparison (field % value == 1)
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Mod(System.String,System.Int32,System.Int32)">
+            <summary>
+            Performs a modulo comparison (field % value == compare)
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.SelectOne">
+            <summary>
+            Selects only one document with the provided parameters
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.SelectOne(System.Int32)">
+            <summary>
+            Selects only one document with the provided parameters
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.SelectOne(CSMongo.Types.QueryOptionTypes)">
+            <summary>
+            Selects only one document with the provided parameters
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.SelectOne(System.String[])">
+            <summary>
+            Selects only one document with the provided parameters
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.SelectOne(System.Int32,System.String[])">
+            <summary>
+            Selects only one document with the provided parameters
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.SelectOne(System.Int32,CSMongo.Types.QueryOptionTypes,System.String[])">
+            <summary>
+            Selects only one document with the provided parameters
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Select">
+            <summary>
+            Selects the records from the database that matches this query
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Select(System.Int32,System.Int32)">
+            <summary>
+            Selects the records from the database that matches this query
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Select(CSMongo.Types.QueryOptionTypes)">
+            <summary>
+            Selects the records from the database that matches this query
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Select(System.String[])">
+            <summary>
+            Selects the records from the database that matches this query
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Select(System.Int32,System.Int32,System.String[])">
+            <summary>
+            Selects the records from the database that matches this query
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Select(CSMongo.Types.QueryOptionTypes,System.String[])">
+            <summary>
+            Selects the records from the database that matches this query
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Select(System.Int32,System.Int32,CSMongo.Types.QueryOptionTypes,System.String[])">
+            <summary>
+            Selects the records from the database that matches this query
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Count">
+            <summary>
+            Determines the total count of records matching this query
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.PullAll(System.String,System.Object)">
+            <summary>
+            removes all occurrences of each value in value_array from field, if field is an array. If field is present but is not an array, an error condition is raised.
+            </summary>
+            <param name="field"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.PullAll(System.Object)">
+            <summary>
+            removes all occurrences of each value in value_array from field, if field is an array. If field is present but is not an array, an error condition is raised.
+            </summary>
+            <param name="document"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.PullAll(CSMongo.Bson.BsonDocument)">
+            <summary>
+            removes all occurrences of each value in value_array from field, if field is an array. If field is present but is not an array, an error condition is raised.
+            </summary>
+            <param name="document"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Pull(System.String,System.Object)">
+            <summary>
+            removes all occurrences of value from field, if field is an array. If field is present but is not an array, an error condition is raised.
+            </summary>
+            <param name="field"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Pull(System.Object)">
+            <summary>
+            removes all occurrences of value from field, if field is an array. If field is present but is not an array, an error condition is raised.
+            </summary>
+            <param name="document"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Pull(CSMongo.Bson.BsonDocument)">
+            <summary>
+            removes all occurrences of value from field, if field is an array. If field is present but is not an array, an error condition is raised.
+            </summary>
+            <param name="document"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.AddToSet(System.String,System.Object)">
+            <summary>
+            Adds value to the array only if its not in the array already.
+            </summary>
+            <param name="field"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.AddToSet(System.Object)">
+            <summary>
+            Adds value to the array only if its not in the array already.
+            </summary>
+            <param name="document"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.AddToSet(CSMongo.Bson.BsonDocument)">
+            <summary>
+            Adds value to the array only if its not in the array already.
+            </summary>
+            <param name="document"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.AddAllToSet(System.String,System.Collections.IEnumerable)">
+            <summary>
+            Adds values to the array only if its not in the array already.
+            </summary>
+            <param name="field"></param>
+            <param name="values"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.AddAllToSet(System.String,System.Object[])">
+            <summary>
+            Adds values to the array only if its not in the array already.
+            </summary>
+            <param name="field"></param>
+            <param name="values"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.AddAllToSet(CSMongo.Bson.BsonDocument)">
+            <summary>
+            Adds value to the array only if its not in the array already.
+            </summary>
+            <param name="document"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Push(System.String,System.Object)">
+            <summary>
+            appends value to field, if field  is an existing array, otherwise sets field to the array [value] if field is not present. If field is present but is not an array, an error condition is raised.
+            </summary>
+            <param name="field"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Push(System.Object)">
+            <summary>
+            appends value to field, if field  is an existing array, otherwise sets field to the array [value] if field is not present. If field is present but is not an array, an error condition is raised.
+            </summary>
+            <param name="document"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Push(CSMongo.Bson.BsonDocument)">
+            <summary>
+            appends value to field, if field  is an existing array, otherwise sets field to the array [value] if field is not present. If field is present but is not an array, an error condition is raised.
+            </summary>
+            <param name="document"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.PushAll(System.String,System.Object)">
+            <summary>
+            appends each value in value_array to field, if field is an existing array, otherwise sets field  to the array value_array if field is not present. If field is present but is not an array, an error condition is raised.
+            </summary>
+            <param name="field"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.PushAll(System.Object)">
+            <summary>
+            appends each value in value_array to field, if field is an existing array, otherwise sets field  to the array value_array if field is not present. If field is present but is not an array, an error condition is raised.
+            </summary>
+            <param name="document"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.PushAll(CSMongo.Bson.BsonDocument)">
+            <summary>
+            appends each value in value_array to field, if field is an existing array, otherwise sets field  to the array value_array if field is not present. If field is present but is not an array, an error condition is raised.
+            </summary>
+            <param name="document"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Pop(System.String)">
+            <summary>
+            removes the last element in an array
+            </summary>
+            <param name="field"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Pop(System.String,System.Boolean)">
+            <summary>
+            Removes all matching fields from each document in the query
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Set(System.String,System.Object)">
+            <summary>
+            Updates the matching record with with values provided or adds the new item to the object entirely
+            </summary>
+            <param name="field"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Set(System.Object)">
+            <summary>
+            Updates all matching records with the values on the provided object
+            or adds the new item to object entirely
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Set(CSMongo.Bson.BsonDocument)">
+            <summary>
+            Updates all matching records with the values on the provided BsonDocument
+            or adds the new item to object entirely
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Unset(System.String[])">
+            <summary>
+            Removes all matching fields from each document in the query
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Increment(System.String[])">
+            <summary>
+            Increments each of the fields provided by one
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Increment(System.Object)">
+            <summary>
+            Increments each of the fields by the number provides - first
+            converting the value to an integer
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Increment(CSMongo.Bson.BsonDocument)">
+            <summary>
+            Increments each of the fields by the number provides - first
+            converting the value to an integer
+            </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Delete">
+            <summary>
+            Performs a selection of all fields matching the query
+            </summary>
+        </member>
+        <member name="T:CSMongo.MongoOid">
+            <summary>
+            Represents an ID number to use for MongoOids
+            </summary>
+        </member>
+        <member name="F:CSMongo.MongoOid.MongoOidByteLength">
+            <summary>
+            The number of bytes to expect from a MongoOid
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoOid.#ctor">
+            <summary>
+            Creates a new Oid and generates an Oid automatically
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoOid.#ctor(System.String)">
+            <summary>
+            Creates an ID using a string version of the Oid
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoOid.#ctor(System.Byte[])">
+            <summary>
+            Creates an new Oid with the provided bytes - Must be 12 bytes long
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoOid.SetId(System.Byte[])">
+            <summary>
+            Sets the ID to a specific value using a set of bytes
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoOid.SetId(System.String)">
+            <summary>
+            Converts a string into an ID - IDs should be a hexadecimal string
+            that is either 35 characters (with hyphens) or 24 characters without
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoOid.GetId">
+            <summary>
+            Returns a string version of this ID
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoOid.ToString">
+            <summary>
+            Returns the string format of the Oid
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoOid.Generate">
+            <summary>
+            Generates the bytes for a new MongoOid
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoOid.Value">
+            <summary>
+            The byte value of the identifier
+            </summary>
+        </member>
+        <member name="T:CSMongo.MongoCollection">
+            <summary>
+            A collection of documents within a Mongo database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.#ctor(CSMongo.MongoDatabase,System.String)">
+            <summary>
+            Creates a new MongoCollection - It is better to create a
+            collection using the MongoDatabase command GetCollection
+            so the database can keep track of multiple instances of
+            the same collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.Find">
+            <summary>
+            Starts a new query for this collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.Find``1">
+            <summary>
+            Starts a new query for this collection using the provider requested
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.Count">
+            <summary>
+            Returns the current count of records for the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.InsertOnSubmit(System.Object)">
+            <summary>
+            Adds a record to be inserted when changes are submitted
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.InsertOnSubmit(CSMongo.MongoDocument)">
+            <summary>
+            Adds a record to be inserted when changes are submitted
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.InsertOnSubmit(System.Collections.Generic.IEnumerable{CSMongo.MongoDocument})">
+            <summary>
+            Adds a set of records to be inserted when changes are submitted
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.DeleteOnSubmit(CSMongo.MongoDocument)">
+            <summary>
+            Adds a record to be deleted when changes are submitted
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.DeleteOnSubmit(System.Collections.Generic.IEnumerable{CSMongo.MongoDocument})">
+            <summary>
+            Adds a set of records to be deleted when changes are submitted
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.UpdateOnSubmit(CSMongo.MongoDocument)">
+            <summary>
+            Appends a document to monitor for changes and updates
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.UpdateOnSubmit(System.Collections.Generic.IEnumerable{CSMongo.MongoDocument})">
+            <summary>
+            Appends a document to monitor for changes and updates
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.SubmitChanges">
+            <summary>
+            Handles updating changes for the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.DropCollection">
+            <summary>
+            Removes a collection from the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.GetStatus">
+            <summary>
+            Returns details about the status of this collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.DeleteIndex">
+            <summary>
+            Removes all indexes from this collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.DeleteIndex(System.String,System.String)">
+            <summary>
+            Removes the specified index from this collection
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoCollection.Name">
+            <summary>
+            The name of the collection to query
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoCollection.Database">
+            <summary>
+            The database connection information
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoCollection.Connection">
+            <summary>
+            Returns the connection used for this request
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDate.GetDataType">
+            <summary>
+            Returns the data type for this object
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDate.IsAllowedValue``1(``0)">
+            <summary>
+            Determines allowed values for this object
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDate.ToBson">
+            <summary>
+            Returns the value for this field in binary format
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDate.FromBsonStream(System.IO.Stream)">
+            <summary>
+            Reads this value from an incoming stream
+            </summary>
+        </member>
+        <member name="T:CSMongo.Types.MongoBinaryTypes">
+            <summary>
+            Available binary formattings for an object
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.CollectionDistinctResult">
+            <summary>
+            The response when finding the distinct values of a collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.CollectionDistinctResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            Creates the details for the distinct values in a collection
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.CollectionDistinctResult.Values">
+            <summary>
+            Returns the values found for the provided index
+            </summary>
+        </member>
+        <member name="T:CSMongo.Extensions.EnumerationExtensions">
+            <summary>
+            Extension methods to make working with Enum values easier
+            </summary>
+        </member>
+        <member name="M:CSMongo.Extensions.EnumerationExtensions.Include``1(System.Enum,``0)">
+            <summary>
+            Includes an enumerated type and returns the new value
+            </summary>
+        </member>
+        <member name="M:CSMongo.Extensions.EnumerationExtensions.Remove``1(System.Enum,``0)">
+            <summary>
+            Removes an enumerated type and returns the new value
+            </summary>
+        </member>
+        <member name="M:CSMongo.Extensions.EnumerationExtensions.Has``1(System.Enum,``0)">
+            <summary>
+            Checks if an enumerated type contains a value
+            </summary>
+        </member>
+        <member name="M:CSMongo.Extensions.EnumerationExtensions.Missing``1(System.Enum,``0)">
+            <summary>
+            Checks if an enumerated type is missing a value
+            </summary>
+        </member>
+        <member name="T:CSMongo.MongoCursor">
+            <summary>
+            Contains information about a cursor for Mongo
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoCursor.#ctor(CSMongo.Requests.QueryRequest,System.Int64,System.Int32)">
+            <summary>
+            Creates a new MongoCursor
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoCursor.Cursor">
+            <summary>
+            The actual cursor value for this 
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoCursor.Query">
+            <summary>
+            The previous query request incase there is no
+            cursor information available
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoCursor.ReturnCount">
+            <summary>
+            The total number of records that were returned previously
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoCursor.HasCursor">
+            <summary>
+            Make certain there is a real cursor to use
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.DatabaseDetailResult">
+            <summary>
+            Unique information about a database on the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.DatabaseDetailResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            Creates the detail for a Database listed in Mongo
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.DatabaseDetailResult.Name">
+            <summary>
+            The name of the database
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.DatabaseDetailResult.SizeOnDisk">
+            <summary>
+            The actual size of the database
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.DatabaseDetailResult.Empty">
+            <summary>
+            Returns if this database is empty or not
+            </summary>
+        </member>
+        <member name="T:CSMongo.DataTypes.MongoNullType">
+            <summary>
+            In the event that an object cannot be determined
+            the fall back should be the MongoNull class
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoNullType.GetDataType">
+            <summary>
+            Returns the Mongo type for this data
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoNullType.IsAllowedValue``1(``0)">
+            <summary>
+            Returns true if the value is empty
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoNullType.ToBson">
+            <summary>
+            Returns bytes to mark something as null
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoNullType.FromBsonStream(System.IO.Stream)">
+            <summary>
+            Reads the null value from the stream
+            </summary>
+        </member>
+        <member name="T:CSMongo.DataTypes.MongoDocumentType">
+            <summary>
+            Represents a sub document type
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDocumentType.GetDataType">
+            <summary>
+            Returns the correct MongoType for this object
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDocumentType.IsAllowedValue``1(``0)">
+            <summary>
+            Returns the allowed types for this object
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDocumentType.Get``1">
+            <summary>
+            No conversions required for this object
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDocumentType.Set``1(``0)">
+            <summary>
+            Type should always be a BSON document type
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDocumentType.ToBson">
+            <summary>
+            Writes the bytes for this document
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoDocumentType.FromBsonStream(System.IO.Stream)">
+            <summary>
+            Reads a document from the stream
+            </summary>
+        </member>
+        <member name="T:CSMongo.Extensions.Queries.MongoQueryExtensions">
+            <summary>
+            Extension methods for working with Mongo Queries
+            </summary>
+        </member>
+        <member name="M:CSMongo.Extensions.Queries.MongoQueryExtensions.As``1(System.Collections.Generic.IEnumerable{CSMongo.MongoDocument},``0)">
+            <summary>
+            Selects information from the document in a specific format
+            </summary>
+        </member>
+        <member name="M:CSMongo.Extensions.Queries.MongoQueryExtensions.As``1(System.Collections.Generic.IEnumerable{CSMongo.MongoDocument},System.String,``0)">
+            <summary>
+            Selects information from the document in a specific format
+            </summary>
+        </member>
+        <member name="M:CSMongo.Extensions.Queries.MongoQueryExtensions.Apply(System.Collections.Generic.IEnumerable{CSMongo.MongoDocument},System.Object)">
+            <summary>
+            Selects information from the document in a specific format
+            </summary>
+        </member>
+        <member name="T:CSMongo.Types.UpdateOptionTypes">
+            <summary>
+            Update options available for a Mongo Update request
+            </summary>
+        </member>
+        <member name="F:CSMongo.Types.UpdateOptionTypes.None">
+            <summary>
+            Nothing special is required for this update
+            </summary>
+        </member>
+        <member name="F:CSMongo.Types.UpdateOptionTypes.Upsert">
+            <summary>
+            If no matching records are found the record will be inserted
+            </summary>
+        </member>
+        <member name="F:CSMongo.Types.UpdateOptionTypes.MultiUpdate">
+            <summary>
+            Updates all matching documents otherwise it will only match
+            the first document found
+            </summary>
+        </member>
+        <member name="T:CSMongo.Types.MongoDataTypes">
+            <summary>
+            Possible data types to expect for a Mongo Document
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.ProfileResult">
+            <summary>
+            Contains information about the profile level for the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.ProfileResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            Returns information about the profile level for this database
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.ProfileResult.PreviousLevel">
+            <summary>
+            The previous level of the profile before the change
+            </summary>
+        </member>
+        <member name="T:CSMongo.Requests.MessageRequest">
+            <summary>
+            Sends a message?
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.MessageRequest.GenerateBody(CSMongo.IO.DynamicStream)">
+            <summary>
+            Generates the message to send
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.MessageRequest.Command">
+            <summary>
+            The command to send
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.GetMoreRequest.#ctor(CSMongo.MongoCollection,CSMongo.MongoCursor,System.Int32)">
+            <summary>
+            Creates a new GetMoreRequest with the provided MongoCursor
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.GetMoreRequest.GenerateBody(CSMongo.IO.DynamicStream)">
+            <summary>
+            Generates the body for this request
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.GetMoreRequest.OnResponse(System.IO.Stream)">
+            <summary>
+            Reads the response stream for results
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.GetMoreRequest.Cursor">
+            <summary>
+            The cursor to find for the query
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.GetMoreRequest.Count">
+            <summary>
+            The total records to return
+            </summary>
+        </member>
+        <member name="T:CSMongo.Bson.MongoFieldReference">
+            <summary>
+            Details about a MongoDataType and the location
+            </summary>
+        </member>
+        <member name="P:CSMongo.Bson.MongoFieldReference.Parent">
+            <summary>
+            The parent object for this field
+            </summary>
+        </member>
+        <member name="P:CSMongo.Bson.MongoFieldReference.Name">
+            <summary>
+            The name of the field that holds this value
+            </summary>
+        </member>
+        <member name="P:CSMongo.Bson.MongoFieldReference.Field">
+            <summary>
+            The actual field controller for this type
+            </summary>
+        </member>
+        <member name="T:CSMongo.Bson.BsonTranslator">
+            <summary>
+            Handles translating bytes to and from BSON format
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.FromStream(System.IO.Stream)">
+            <summary>
+            Handles reading a type from a stream
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.AsByte(System.Byte)">
+            <summary>
+            Creates the bytes for an integer in BSON format
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.AsBinary(System.Byte[])">
+            <summary>
+            Writes a binary object to the Mongo database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.AsInt32(System.Int32)">
+            <summary>
+            Creates the bytes for an integer in BSON format
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.AsNumber(System.Double)">
+            <summary>
+            Creates the bytes for a number in BSON format
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.AsBoolean(System.Boolean)">
+            <summary>
+            Creates the bytes for a boolean in BSON format
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.AsUInt64(System.UInt64)">
+            <summary>
+            Creates the bytes for a unsigned long in BSON format
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.AsInt64(System.Int64)">
+            <summary>
+            Creates the bytes for a long in BSON format
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.AsCString(System.String)">
+            <summary>
+            Writes a the bytes for a CS string in BSON format
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.AsString(System.String)">
+            <summary>
+            Creates the bytes for a regular string in BSON format
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.AsNull">
+            <summary>
+            Writes the null value in BSON format
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.AsOid(CSMongo.MongoOid)">
+            <summary>
+            Returns the bytes required for the MongoOid
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.AsArray(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Writes the bytes for an array of values
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.AsDate(System.DateTime)">
+            <summary>
+            Writes a date in BSON format
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.ReadRegularExpression(System.IO.Stream)">
+            <summary>
+            Reads a regular expression from the stream
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.ReadBinary(System.IO.Stream)">
+            <summary>
+            Reads a binary object from the stream
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.ReadObject(System.IO.Stream)">
+            <summary>
+            Reads a MongoDocument from the stream
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.ReadBoolean(System.IO.Stream)">
+            <summary>
+            Reads a boolean value from the stream
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.ReadNumber(System.IO.Stream)">
+            <summary>
+            Reads a number value from the stream
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.ReadInt32(System.IO.Stream)">
+            <summary>
+            Reads an int32 value from the stream
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.ReadInt64(System.IO.Stream)">
+            <summary>
+            Handles reading int64 value from the stream
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.ReadOid(System.IO.Stream)">
+            <summary>
+            Reads an Oid value from a BSON object
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.ReadString(System.IO.Stream)">
+            <summary>
+            Reads a string value from a BSON object (zero terminated)
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.ReadCString(System.IO.Stream)">
+            <summary>
+            Reads a cstring value using the length provided as the object value
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.ReadNull(System.IO.Stream)">
+            <summary>
+            Handles reading the null value from the stream
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.ReadArray(System.IO.Stream)">
+            <summary>
+            Reads incoming values from the stream as an array
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.ReadDate(System.IO.Stream)">
+            <summary>
+            Reads a stream to get a date time value
+            </summary>
+        </member>
+        <member name="T:CSMongo.Exceptions.MissingCollectionNameException">
+            <summary>
+            Thrown when an empty string is used as a MongoCollection name
+            </summary>
+        </member>
+        <member name="M:CSMongo.Exceptions.MissingCollectionNameException.#ctor(System.String)">
+            <summary>
+            Throws that a collection name was not found
+            </summary>
+        </member>
+        <member name="T:CSMongo.Responses.CommandResponse">
+            <summary>
+            Handles working with a response from a command
+            </summary>
+        </member>
+        <member name="M:CSMongo.Responses.CommandResponse.#ctor(System.IO.Stream)">
+            <summary>
+            Creates a response to a command request
+            </summary>
+        </member>
+        <member name="M:CSMongo.Responses.CommandResponse.IsResponseOk">
+            <summary>
+            Verifies that a query response has an okay response within it
+            </summary>
+        </member>
+        <member name="P:CSMongo.Responses.CommandResponse.HasResponse">
+            <summary>
+            Returns if an actual response was found from this request
+            </summary>
+        </member>
+        <member name="P:CSMongo.Responses.CommandResponse.Detail">
+            <summary>
+            Returns the main document for the response or
+            an empty document if nothing was found
+            </summary>
+        </member>
+        <member name="T:CSMongo.Requests.InsertRequest">
+            <summary>
+            Handles inserting content into a database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.InsertRequest.#ctor(CSMongo.MongoCollection)">
+            <summary>
+            Creates an empty insert request
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.InsertRequest.GenerateBody(CSMongo.IO.DynamicStream)">
+            <summary>
+            Prepares the body of the request to send to the server
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.InsertRequest.Documents">
+            <summary>
+            A collection of documents that should be inserted
+            </summary>
+        </member>
+        <member name="T:CSMongo.MongoDatabase">
+            <summary>
+            An connection to a Mongo Database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.#ctor(System.String)">
+            <summary>
+            Uses the connection string information to access a database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.#ctor(System.String,System.String)">
+            <summary>
+            Uses a connection to refer to a Mongo database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.#ctor(System.String,System.String,System.Boolean)">
+            <summary>
+            Uses a connection to refer to a Mongo database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.#ctor(System.String,System.String,System.Int32)">
+            <summary>
+            Uses a connection to refer to a Mongo database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.#ctor(System.String,System.String,System.Int32,System.Boolean)">
+            <summary>
+            Uses a connection to refer to a Mongo database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.#ctor(System.String,System.String,System.String,System.String)">
+            <summary>
+            Uses a connection to refer to a Mongo database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.#ctor(System.String,System.String,System.Int32,System.String,System.String,System.Boolean)">
+            <summary>
+            Uses a connection to refer to a Mongo database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.From(System.String)">
+            <summary>
+            Starts a new query for a collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.From``1(System.String)">
+            <summary>
+            Starts a new query for a collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.Insert(System.String,System.Object)">
+            <summary>
+            Inserts a series of documents into the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.Insert(System.String,CSMongo.MongoDocument)">
+            <summary>
+            Inserts a series of documents into the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.Insert(System.String,System.Object[])">
+            <summary>
+            Inserts a series of documents into the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.Insert(System.String,CSMongo.MongoDocument[])">
+            <summary>
+            Inserts a series of documents into the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.Insert(System.String,System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Inserts a series of documents into the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.Insert(System.String,System.Collections.Generic.IEnumerable{CSMongo.MongoDocument})">
+            <summary>
+            Inserts a series of documents into the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.Shutdown">
+            <summary>
+            Sends the shutdown signal for this server
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.Logout">
+            <summary>
+            Sends the logout request to the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.RepairDatabase(System.Boolean,System.Boolean)">
+            <summary>
+            Attempts to repair, compact the current database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.SetProfileLevel(System.Int32)">
+            <summary>
+            Sets the profile level on the server and returns the previous value
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.DropCollection(CSMongo.MongoCollection)">
+            <summary>
+            Removes a collection based on the name
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.DropCollection(System.String)">
+            <summary>
+            Removes a collection based on the name
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.DropDatabase">
+            <summary>
+            Completely removes a Mongo database from the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.ResetErrors">
+            <summary>
+            Clears any errors from the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.GetLastError">
+            <summary>
+            Returns the most recent error from the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.GetPreviousError">
+            <summary>
+            Returns a previous error message from the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.ForceError">
+            <summary>
+            Causes an error on the server -- Uh... wut?
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.DeleteCollectionIndex(System.String)">
+            <summary>
+            Removes all indexes from the provided collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.DeleteCollectionIndex(System.String,System.String)">
+            <summary>
+            Removes the specified index from the collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.GetOpTime">
+            <summary>
+            Returns the OpTime value from the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.RunCommand(System.Object)">
+            <summary>
+            Manually invokes a command against the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.RunCommand(System.Object,System.Boolean)">
+            <summary>
+            Manually invokes a command against the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.RunCommand(CSMongo.Bson.BsonObject)">
+            <summary>
+            Manually invokes a command against the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.RunCommand(CSMongo.Bson.BsonObject,System.Boolean)">
+            <summary>
+            Manually invokes a command against the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.SendRequest(CSMongo.Requests.RequestBase)">
+            <summary>
+            Sends a prepared request to the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.Disconnect">
+            <summary>
+            Handles disconnecting from the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.SubmitChanges">
+            <summary>
+            Submits changes for all collections that have items queued
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.GetCollection(System.String)">
+            <summary>
+            Returns the reference to a collection but does not
+            actually communicate or create the collection 
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.Authenticate">
+            <summary>
+            Authenticates to this database using the current username and password
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.Authenticate(System.String,System.String)">
+            <summary>
+            Authenticates this request with the provided username and password
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.GetLastCursor">
+            <summary>
+            Returns the most recently entered cursor
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.GetMore">
+            <summary>
+            Gets more documents from the most recently added cursor
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.GetMore(System.Int32)">
+            <summary>
+            Gets more documents from the most recently added cursor
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.GetMore(CSMongo.MongoCursor)">
+            <summary>
+            Gets more documents from the provided MongoCursor
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.GetMore(CSMongo.MongoCursor,System.Int32)">
+            <summary>
+            Gets more documents from the provided MongoCursor
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.RegisterCursor(CSMongo.MongoCursor)">
+            <summary>
+            Returns an instance of a cursor
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.KillCursors">
+            <summary>
+            Kills any available cursors to the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoDatabase.Dispose">
+            <summary>
+            Handles ensuring that a connection is cleaned up when finished
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoDatabase.Name">
+            <summary>
+            The name of the database
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoDatabase.Username">
+            <summary>
+            The username to connect with
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoDatabase.Password">
+            <summary>
+            The password to connect with
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoDatabase.AutoConnect">
+            <summary>
+            Gets or sets if this connection automatically opens
+            when a request is made and the connection is closed
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoDatabase.HasAuthenticated">
+            <summary>
+            Has this user authenticated to the server - If no 
+            username and password is set then authentication
+            will not ever be attempted
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoDatabase.Connection">
+            <summary>
+            The connection to use being used for this database
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoDatabase.Cursors">
+            <summary>
+            Returns a list of currently available cursors
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoDatabase.HasCredentials">
+            <summary>
+            Checks if this connection has both a username and password provided
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoDatabase.Item(System.String)">
+            <summary>
+            Returns access to a collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonAnonymousTypeParser.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            Creates a new parser for the provided information
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonAnonymousTypeParser.IsAnonymousType(System.Object)">
+            <summary>
+            Attempts to distingusing anonymous types from
+            other object types
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonAnonymousTypeParser.PopulateAnonymousType``1(CSMongo.Bson.BsonObject,``0)">
+            <summary>
+            Attempts to assign the values of a BsonObject into new Anonymous Type values
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonAnonymousTypeParser.PopulateAnonymousType``1(CSMongo.Bson.BsonObject,System.String,``0)">
+            <summary>
+            Attempts to assign the values of a BsonObject into new Anonymous Type values
+            </summary>
+        </member>
+        <member name="F:CSMongo.Types.OpCodeTypes.GetByOid">
+            <summary>
+            (Apparently not used)
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.ListDatabasesResult">
+            <summary>
+            Information related to the databases found in this Mongo instance
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.ListDatabasesResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            Creates a list of databases in this instance of Mongo
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.ListDatabasesResult.GetEnumerator">
+            <summary>
+            Returns an enumerator to loop through the collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.ListDatabasesResult.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Returns an enumerator to loop through the collection
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.ListDatabasesResult.TotalSize">
+            <summary>
+            Returns the total size of the databases found
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.ListDatabasesResult.Databases">
+            <summary>
+            The list of databases that were found
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.ListDatabasesResult.Count">
+            <summary>
+            The total count of databases available
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.DeleteCollectionIndexResult">
+            <summary>
+            Details about the indexes deleted from a collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.DeleteCollectionIndexResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            The information returned when calling the FSync command
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.DeleteCollectionIndexResult.IndexCount">
+            <summary>
+            The number of indexes found
+            </summary>
+        </member>
+        <member name="T:CSMongo.Bson.BsonFieldDetail">
+            <summary>
+            Information about a BSON field after it has
+            been rendered into bytes
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonFieldDetail.#ctor(System.String,System.Byte[],CSMongo.DataTypes.MongoDataType)">
+            <summary>
+            Creates a new set of details for a BSON field
+            </summary>
+        </member>
+        <member name="P:CSMongo.Bson.BsonFieldDetail.Field">
+            <summary>
+            The string name for this field
+            </summary>
+        </member>
+        <member name="P:CSMongo.Bson.BsonFieldDetail.Type">
+            <summary>
+            The original MongoDataType for this field
+            </summary>
+        </member>
+        <member name="P:CSMongo.Bson.BsonFieldDetail.Bytes">
+            <summary>
+            The bytes that create this object
+            </summary>
+        </member>
+        <member name="P:CSMongo.Bson.BsonFieldDetail.Length">
+            <summary>
+            Returns the total length of the bytes in the set
+            </summary>
+        </member>
+        <member name="T:CSMongo.Requests.QueryRequest">
+            <summary>
+            Creates a new QueryRequest for records
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.QueryRequest.#ctor(CSMongo.MongoCollection)">
+            <summary>
+            Creates a new insert request for the provided database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.QueryRequest.#ctor(System.String,System.String)">
+            <summary>
+            Creates a new insert request for the provided database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.QueryRequest.GenerateBody(CSMongo.IO.DynamicStream)">
+            <summary>
+            Creates the body of the request to send
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.QueryRequest.OnResponse(System.IO.Stream)">
+            <summary>
+            Reads the response stream for results
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.QueryRequest.Skip">
+            <summary>
+            The total records to skip past
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.QueryRequest.Take">
+            <summary>
+            The total records to return
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.QueryRequest.Options">
+            <summary>
+            The options to use with this query
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.QueryRequest.Fields">
+            <summary>
+            A list of fields to select - If empty then 
+            everything is returned
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.QueryRequest.Parameters">
+            <summary>
+            The query filter information to use
+            </summary>
+        </member>
+        <member name="T:CSMongo.DataTypes.MongoBooleanType">
+            <summary>
+            Handles working with boolean values
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoBooleanType.GetDataType">
+            <summary>
+            Returns the Mongo type for this data
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoBooleanType.IsAllowedValue``1(``0)">
+            <summary>
+            Checks for boolean values
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoBooleanType.ToBson">
+            <summary>
+            Returns the bytes to generate this object
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoBooleanType.FromBsonStream(System.IO.Stream)">
+            <summary>
+            Reads a boolean value from a stream
+            </summary>
+        </member>
+        <member name="T:CSMongo.Bson.BsonMongoDictionary">
+            <summary>
+            General container for holding Mongo fields in a document
+            </summary>
+        </member>
+        <member name="T:CSMongo.Exceptions.InvalidMongoConnectionStringException">
+            <summary>
+            Thrown when a connection string cannot be parsed
+            </summary>
+        </member>
+        <member name="M:CSMongo.Exceptions.InvalidMongoConnectionStringException.#ctor">
+            <summary>
+            Throws that the provided connection stirng is not
+            in an acceptable format
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.CollectionCountResult">
+            <summary>
+            The resulting information from a count request for a database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.CollectionCountResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            Count information for the specified collection
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.CollectionCountResult.TotalDocuments">
+            <summary>
+            The total documents found in the collection
+            </summary>
+        </member>
+        <member name="T:CSMongo.Requests.UpdateRequest">
+            <summary>
+            Handles inserting content into a database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.UpdateRequest.#ctor(CSMongo.MongoCollection)">
+            <summary>
+            Creates an empty update request
+            </summary>
+        </member>
+        <member name="M:CSMongo.Requests.UpdateRequest.GenerateBody(CSMongo.IO.DynamicStream)">
+            <summary>
+            Prepares the body of the request to send to the server
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.UpdateRequest.Options">
+            <summary>
+            The options available to update the document
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.UpdateRequest.Parameters">
+            <summary>
+            The query filter information to use
+            </summary>
+        </member>
+        <member name="P:CSMongo.Requests.UpdateRequest.Modifications">
+            <summary>
+            The modifications to make to the object that are found
+            </summary>
+        </member>
+        <member name="T:CSMongo.MongoConnectionString">
+            <summary>
+            Reads connection strings for MongoDatabases
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoConnectionString.#ctor">
+            <summary>
+            Creates a new empty connection string reader
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoConnectionString.Parse(System.String)">
+            <summary>
+            Parses a string for Mongo connection data
+            </summary>
+        </member>
+        <member name="M:CSMongo.MongoConnectionString.ParseString(System.String)">
+            <summary>
+            Attempts to read the values for a connection string
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoConnectionString.Host">
+            <summary>
+            The server or IP address to connect to
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoConnectionString.Port">
+            <summary>
+            The port number to connect on
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoConnectionString.Database">
+            <summary>
+            The name of the database to open
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoConnectionString.Username">
+            <summary>
+            The username to use when connecting
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoConnectionString.Password">
+            <summary>
+            The password to use when connecting
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoConnectionString.AutoConnect">
+            <summary>
+            Does this connection automatically open
+            </summary>
+        </member>
+        <member name="T:CSMongo.Commands.MongoDatabaseCommands">
+            <summary>
+            Collection of database related commands
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.LogOut(CSMongo.MongoDatabase)">
+            <summary>
+            Performs a manual log our for a connection
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.Authenticate(CSMongo.MongoDatabase,System.String,System.String)">
+            <summary>
+            Handles logging into the specified database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.GetNonce(CSMongo.MongoDatabase)">
+            <summary>
+            Loads the 'nonce' value for password hashing
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.KillCursors(CSMongo.MongoDatabase,System.Collections.Generic.IEnumerable{CSMongo.MongoCursor})">
+            <summary>
+            Sends the request to kill existing cursors
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.KillCursors(CSMongo.MongoDatabase,System.Collections.Generic.IEnumerable{System.Int64})">
+            <summary>
+            Sends the request to kill existing cursors
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.ResetErrors(CSMongo.MongoDatabase)">
+            <summary>
+            Causes the Mongo server to shutdown - No response is expected
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.GetLastError(CSMongo.MongoDatabase)">
+            <summary>
+            Gets the most recent error from the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.DropDatabase(CSMongo.MongoDatabase)">
+            <summary>
+            Deletes a database from the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.RepairDatabase(CSMongo.MongoDatabase,System.Boolean,System.Boolean)">
+            <summary>
+            Attempts to repair the current database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.GetAssertInfo(CSMongo.MongoDatabase)">
+            <summary>
+            Returns assert info for the database ??
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.GetOpTime(CSMongo.MongoDatabase)">
+            <summary>
+            Returns OpTime for the provided database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.Clone(CSMongo.MongoDatabase,System.String)">
+            <summary>
+            Clones the current database from the provided host to this server
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.SetProfileLevel(CSMongo.MongoDatabase,System.Int32)">
+            <summary>
+            Sets and returns the previous profiling level
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.CollectionCount(CSMongo.MongoDatabase,System.String)">
+            <summary>
+            Returns the count of records from the specified collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.CollectionCount(CSMongo.MongoDatabase,System.String,System.Object)">
+            <summary>
+            Returns the count of records from the specified collection 
+            that meet the criteria for the query 
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.CollectionCount(CSMongo.MongoDatabase,System.String,CSMongo.Bson.BsonDocument)">
+            <summary>
+            Returns the count of records from the specified collection 
+            that meet the criteria for the query 
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.GetBuildInfo(CSMongo.MongoDatabase)">
+            <summary>
+            Returns build info for the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.ListDatabases(CSMongo.MongoDatabase)">
+            <summary>
+            Returns a list of all available databases
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.FSync(CSMongo.MongoDatabase,System.Boolean)">
+            <summary>
+            Performs the FSync command against the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.CopyDatabase(CSMongo.MongoDatabase,System.String,System.String,System.String,System.Int32,System.String,System.String)">
+            <summary>
+            Copies a database from one location to another
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.Shutdown(CSMongo.MongoDatabase)">
+            <summary>
+            Causes the Mongo server to shutdown - No response is expected
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.GetPreviousError(CSMongo.MongoDatabase)">
+            <summary>
+            Returns information about previous errors on the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.ForceError(CSMongo.MongoDatabase)">
+            <summary>
+            Forces an error message on the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.GetServerStatus(CSMongo.MongoDatabase)">
+            <summary>
+            Returns uptime, lock and memory info for the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.GetOpLogging(CSMongo.MongoDatabase)">
+            <summary>
+            Returns OpLogging information for the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.SetQueryTraceLevel(CSMongo.MongoDatabase,System.Int32)">
+            <summary>
+            Sets the level for the Query Trace in the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.DropCollection(CSMongo.MongoDatabase,System.String)">
+            <summary>
+            Removes a collection entirely from the database
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.GetCollectionStats(CSMongo.MongoDatabase,System.String)">
+            <summary>
+            Returns details about the provided collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.GetCollectionDistinct(CSMongo.MongoDatabase,System.String,System.String)">
+            <summary>
+            Gets the distinct values for the collection and key provided
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.DeleteAllCollectionIndexes(CSMongo.MongoDatabase,System.String)">
+            <summary>
+            Removes all indexes from the provided collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.DeleteCollectionIndex(CSMongo.MongoDatabase,System.String,System.String)">
+            <summary>
+            Removes the index for key in the provided collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.RunCommand(CSMongo.MongoDatabase,System.Object)">
+            <summary>
+            Executes a command against the database using the provided information
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.RunCommand(CSMongo.MongoDatabase,System.Object,System.Boolean)">
+            <summary>
+            Executes a command against the database using the provided information
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.RunCommand(CSMongo.MongoDatabase,CSMongo.Bson.BsonObject)">
+            <summary>
+            Executes a command against the database using the provided information
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.RunCommand(CSMongo.MongoDatabase,CSMongo.Bson.BsonObject,System.Boolean)">
+            <summary>
+            Executes a command against the database using the provided information
+            </summary>
+        </member>
+        <member name="M:CSMongo.Commands.MongoDatabaseCommands.HashPassword(System.String,System.String,System.String)">
+            <summary>
+            Handles preparing a password to send to the database
+            </summary>
+        </member>
+        <member name="T:CSMongo.Exceptions.NoCursorsFoundException">
+            <summary>
+            Thrown when attempting to get access to a cursor but
+            the collection has no cursors available
+            </summary>
+        </member>
+        <member name="M:CSMongo.Exceptions.NoCursorsFoundException.#ctor">
+            <summary>
+            Throws that the collection has no cursors waiting
+            </summary>
+        </member>
+        <member name="T:CSMongo.Exceptions.MongoSerializationException">
+            <summary>
+            Thrown when trying to serialize an object to a byte
+            array but the binary formatter fails
+            </summary>
+        </member>
+        <member name="M:CSMongo.Exceptions.MongoSerializationException.#ctor(System.String,System.Exception)">
+            <summary>
+            Throws that an object could not be serialized
+            </summary>
+        </member>
+        <member name="T:CSMongo.IO.DynamicStream">
+            <summary>
+            Works with bytes that could be modified in different locations
+            at any given time
+            </summary>
+        </member>
+        <member name="M:CSMongo.IO.DynamicStream.#ctor">
+            <summary>
+            Creates an empty DynamicStream
+            </summary>
+        </member>
+        <member name="M:CSMongo.IO.DynamicStream.#ctor(System.Int32)">
+            <summary>
+            Creates a stream with the provided length with all 0 bytes
+            </summary>
+        </member>
+        <member name="M:CSMongo.IO.DynamicStream.#ctor(System.Int32,System.Byte)">
+            <summary>
+            Creates a stream with the provided length defaulting to the byte specified
+            </summary>
+        </member>
+        <member name="M:CSMongo.IO.DynamicStream.InsertAt(System.Int32,System.Byte[])">
+            <summary>
+            Inserts a new byte at the specified index
+            </summary>
+        </member>
+        <member name="M:CSMongo.IO.DynamicStream.InsertAt(System.Int32,System.Byte)">
+            <summary>
+            Inserts new bytes at the specified index
+            </summary>
+        </member>
+        <member name="M:CSMongo.IO.DynamicStream.WriteAt(System.Int32,System.Byte)">
+            <summary>
+            Overwrites the byte at the specified index
+            </summary>
+        </member>
+        <member name="M:CSMongo.IO.DynamicStream.WriteAt(System.Int32,System.Byte[])">
+            <summary>
+            Overwrites the bytes the the specified index
+            </summary>
+        </member>
+        <member name="M:CSMongo.IO.DynamicStream.Append(System.Byte)">
+            <summary>
+            Appends the byte to the end of the stream
+            </summary>
+        </member>
+        <member name="M:CSMongo.IO.DynamicStream.Append(System.Byte[])">
+            <summary>
+            Appends the bytes to the end of the stream
+            </summary>
+        </member>
+        <member name="M:CSMongo.IO.DynamicStream.Read(System.Int32,System.Int32)">
+            <summary>
+            Reads the bytes within the specified area
+            </summary>
+        </member>
+        <member name="M:CSMongo.IO.DynamicStream.ToArray">
+            <summary>
+            Returns all of the bytes for the stream as an array
+            </summary>
+        </member>
+        <member name="P:CSMongo.IO.DynamicStream.Length">
+            <summary>
+            Returns the current length of the stream
+            </summary>
+        </member>
+        <member name="T:CSMongo.DataTypes.MongoBinaryType">
+            <summary>
+            Handles working with arrays of bytes
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoBinaryType.GetDataType">
+            <summary>
+            Returns the type of object this is
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoBinaryType.IsAllowedValue``1(``0)">
+            <summary>
+            Returns if a value is allowed for this type
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoBinaryType.ToBson">
+            <summary>
+            Handles reading the bytes from the request
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoBinaryType.FromBsonStream(System.IO.Stream)">
+            <summary>
+            Reads a binary array from the stream
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoBinaryType.Get``1">
+            <summary>
+            If this field is requested and not for the byte
+            array then try and deserialze the value
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoBinaryType.Set``1(``0)">
+            <summary>
+            Try to serialize any values that are set and are not
+            actually in binary format. This really shouldn't ever happen
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoBinaryType.ConvertValue``1(System.Object)">
+            <summary>
+            No conversion required. Simply pass the value
+            </summary>
+        </member>
+        <member name="T:CSMongo.DataTypes.LargeEnumeratedType">
+            <summary>
+            Handles working with large enumerated value types
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.LargeEnumeratedType.GetDataType">
+            <summary>
+            Returns the correct data type to store this value
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.LargeEnumeratedType.IsAllowedValue``1(``0)">
+            <summary>
+            Determines if the value provided can be used 
+            for this value
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.LargeEnumeratedType.Get``1">
+            <summary>
+            Handles getting the current value for this field
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.LargeEnumeratedType.Set``1(``0)">
+            <summary>
+            Converts the enumerated value to a safe level
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.LargeEnumeratedType.ConvertValue``1(System.Object)">
+            <summary>
+            Performs any conversions for a number
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.LargeEnumeratedType.ToBson">
+            <summary>
+            Converts the value into an appropriate byte value
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.LargeEnumeratedType.FromBsonStream(System.IO.Stream)">
+            <summary>
+            Reads the value from an incoming stream
+            </summary>
+        </member>
+        <member name="T:CSMongo.Exceptions.MongoTypeAlreadyRegisteredException">
+            <summary>
+            Thrown when attempting to register the same MongoDataType 
+            more than once
+            </summary>
+        </member>
+        <member name="M:CSMongo.Exceptions.MongoTypeAlreadyRegisteredException.#ctor(System.Type)">
+            <summary>
+            Throws that the requested type has already been registered
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.FSyncResult">
+            <summary>
+            Information about the result of a FSync command
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.FSyncResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            The information returned when calling the FSync command
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.FSyncResult.NumberOfFiles">
+            <summary>
+            Returns the number of files after the FSync command
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.ForceErrorResult">
+            <summary>
+            A result when attempting to force an error on the server
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.ForceErrorResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            Creates a new container for the error result
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.ForceErrorResult.Assertion">
+            <summary>
+            Returns the assertion that was used for this error
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.ForceErrorResult.ErrorMessage">
+            <summary>
+            Returns the errormessage thrown by the server
+            </summary>
+        </member>
+        <member name="T:CSMongo.Results.DropCollectionResult">
+            <summary>
+            The details after deleting a collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.Results.DropCollectionResult.#ctor(CSMongo.Bson.BsonObject)">
+            <summary>
+            The result when trying to remove a collection
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.DropCollectionResult.IndexCount">
+            <summary>
+            The number of indexes found when removing the collection
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.DropCollectionResult.Namespace">
+            <summary>
+            The namespace of the removed collection
+            </summary>
+        </member>
+        <member name="P:CSMongo.Results.DropCollectionResult.Message">
+            <summary>
+            The message returned from the server
+            </summary>
+        </member>
+        <member name="T:CSMongo.Exceptions.ConnectionNotOpenedException">
+            <summary>
+            Thrown when a request is sent to the server but 
+            the connection has not been opened yet
+            </summary>
+        </member>
+        <member name="M:CSMongo.Exceptions.ConnectionNotOpenedException.#ctor(System.String)">
+            <summary>
+            Throws an exception that the connection isn't ready yet
+            </summary>
+        </member>
+    </members>
+</doc>

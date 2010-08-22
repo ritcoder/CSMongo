@@ -45,6 +45,10 @@ namespace CSMongo.Bson {
         /// </summary>
         public bool UseRawFieldNames { get; set; }
         /// <summary>
+        /// Gets or set if nulls will be ignored when populating the fields with values
+        /// </summary>
+        public bool IgnoreNulls { get; set; }
+        /// <summary>
         /// Gets or sets if this dynamic object cares about properties
         /// being in the right case or not
         /// </summary>
@@ -144,12 +148,12 @@ namespace CSMongo.Bson {
 
             //check the field value was found
             if (type == null || type.Field == null) {
-                type.Parent._Fields.Add(type.Name, null);
+                type.Parent._Fields.Add(type.Name, null); //tocheck: if type == null, this will throw an exception
             }
 
             //if the type is found make sure it is compatible
             //and if not then simply create a new container
-            if (type.Field == null || (type.Field is MongoDataType && !type.Field.IsAllowedValue(value))) {
+            if (type.Field == null || (!type.Field.IsAllowedValue(value))) {
                 type.Parent._Fields[type.Name] = MongoDataType.FindTypeFor(value);
             }
 
@@ -274,7 +278,7 @@ namespace CSMongo.Bson {
         /// Merges this object with the provided object
         /// </summary>
         public virtual void Merge<T>(T source) where T : class {
-            BsonObject._Populate(this, source);
+            BsonObject._Populate(this, source,IgnoreNulls);
         }
 
         /// <summary>
@@ -383,7 +387,7 @@ namespace CSMongo.Bson {
                 container.Field = checkSet(part, container.Parent);
 
                 //if this is missing and requesting to create, do it now
-                if ((container == null || container.Field == null) && !last && createIfMissing) {
+                if ((container.Field == null) && !last && createIfMissing) {
                     container.Field = new MongoDocumentType();
                     container.Field.Set(new BsonDocument());
                     container.Parent._Fields.Add(part, container.Field);
@@ -404,8 +408,9 @@ namespace CSMongo.Bson {
 
         #region Static Creation
 
-        //handles populating an object with information
-        private static void _Populate(BsonObject target, object source) {
+        //handles populating an object with information. If ignoreNulls is true, a field will not be added or updated if null
+        //will this rather be better in the set method?
+        private static void _Populate(BsonObject target, object source,bool ignoreNulls) {
             if (source == null) { return; }
             if (source is BsonObject) { return; }
             
@@ -420,21 +425,29 @@ namespace CSMongo.Bson {
                 if (member is PropertyInfo) {
                     PropertyInfo property = member as PropertyInfo;
                     if (property.CanRead) {
-                        target.Set(property.Name, property.GetValue(source, null));
+                        var value = property.GetValue(source, null);
+                        if (value == null && ignoreNulls) continue;
+                        target.Set(property.Name, value);
                     }
                 }
                 //and fields
                 else if (member is FieldInfo) {
                     FieldInfo field = member as FieldInfo;
                     if (field.IsPublic) {
-                        target.Set(field.Name, field.GetValue(source));
+                        var value = field.GetValue(source);
+                        if (value == null && ignoreNulls) continue;
+                        target.Set(field.Name, value);
                     }
                 }
 
             }
 
         }
-
+        //handles populating an object with information
+        private static void _Populate(BsonObject target, object source)
+        {
+            _Populate(target,source,false);
+        }
         #endregion
 
         #region Static Serialization

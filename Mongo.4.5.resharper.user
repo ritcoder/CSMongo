@@ -1,0 +1,63 @@
+<Configuration>
+  <SettingsComponent>
+    <string />
+    <integer />
+    <boolean>
+      <setting name="SolutionAnalysisEnabled">False</setting>
+    </boolean>
+  </SettingsComponent>
+  <NAntValidationSettings>
+    <NAntPath value="" />
+  </NAntValidationSettings>
+  <CompletionStatisticsManager>
+    <ItemStatistics item="Qualified:CSMongo.Query.MongoQuery">
+      <Item value="Set" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Default">
+      <Item value="new" priority="2" />
+      <Item value="BsonDocument" priority="1" />
+      <Item value="public" priority="0" />
+      <Item value="void" priority="0" />
+      <Item value="string" priority="0" />
+      <Item value="object" priority="0" />
+      <Item value="var" priority="0" />
+      <Item value="doc" priority="1" />
+      <Item value="value" priority="0" />
+      <Item value="Set" priority="0" />
+      <Item value="db" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:CSMongo.MongoDatabase">
+      <Item value="GetLastError" priority="0" />
+    </ItemStatistics>
+  </CompletionStatisticsManager>
+  <RecentFiles>
+    <RecentFiles>
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/f:observations+actions.txt" caret="257" fromTop="3" />
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/d:Requests/f:CollectionRequestBase.cs" caret="285" fromTop="5" />
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/d:Query/f:MongoQuery.cs" caret="8466" fromTop="61" />
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/d:Requests/f:UpdateRequest.cs" caret="295" fromTop="8" />
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/d:Requests/f:RequestBase.cs" caret="4007" fromTop="125" />
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/f:MongoConnection.cs" caret="5531" fromTop="21" />
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/d:Requests/f:QueryRequest.cs" caret="3373" fromTop="13" />
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/d:Responses/f:CommandResponse.cs" caret="0" fromTop="0" />
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/f:Mongo.cs" caret="1466" fromTop="2" />
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/d:Commands/f:MongoDatabaseCommands.cs" caret="4128" fromTop="15" />
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/f:MongoDatabase.cs" caret="10743" fromTop="15" />
+      <File id="E50D61C9-732C-4549-8609-048B99555EA8/f:Program.cs" caret="173" fromTop="9" />
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/d:Responses/f:QueryResponse.cs" caret="1919" fromTop="42" />
+    </RecentFiles>
+    <RecentEdits>
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/d:Query/f:MongoQuery.cs" caret="23307" fromTop="126" />
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/f:observations+actions.txt" caret="256" fromTop="3" />
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/d:Query/f:MongoQuery.cs" caret="23039" fromTop="122" />
+      <File id="E50D61C9-732C-4549-8609-048B99555EA8/f:Program.cs" caret="628" fromTop="19" />
+      <File id="E50D61C9-732C-4549-8609-048B99555EA8/f:Program.cs" caret="486" fromTop="14" />
+    </RecentEdits>
+  </RecentFiles>
+  <UnitTestRunner>
+    <Providers />
+  </UnitTestRunner>
+  <UnitTestRunnerMSTest>
+    <UseTestRunConfigFromMetadataFile>False</UseTestRunConfigFromMetadataFile>
+  </UnitTestRunnerMSTest>
+</Configuration>

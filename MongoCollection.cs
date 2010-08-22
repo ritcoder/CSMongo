@@ -96,7 +96,10 @@ namespace CSMongo {
         /// Adds a record to be inserted when changes are submitted
         /// </summary>
         public void InsertOnSubmit(object document) {
-            this._Inserts.Add(new MongoDocument(document));
+            if (document is MongoDocument)
+                InsertOnSubmit((MongoDocument)document);
+            else
+                this._Inserts.Add(new MongoDocument(document));
         }
 
         /// <summary>

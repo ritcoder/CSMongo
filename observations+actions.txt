@@ -1,0 +1,16 @@
+﻿04/30/2010:
+1. Updated BsonObject to recognise @ as an indication to use the field as it is
+2. In the case of increment, the document is update and this causes the field to be split. 
+3. Added an overload to MongoQuery.Set that takes a field and a value
+
+
+
+
+
+Missing features
+1. aggregates
+	- distinct
+	- count
+2. advanced queries
+3. Take an object to use as the filter parameter
+4. Take an object to be used as the property selector
