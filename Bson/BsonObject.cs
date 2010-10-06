@@ -70,6 +70,15 @@ namespace CSMongo.Bson {
         #region Working With Fields
 
         /// <summary>
+        /// Gets the field names in this type
+        /// </summary>
+        /// <returns></returns>
+        public string[] GetFieldNames()
+        {
+            return _Fields.Keys.ToArray();
+        }
+
+        /// <summary>
         /// Assigns or gets the value of a field on this object
         /// </summary>
         public object this[string field] {
@@ -80,15 +89,18 @@ namespace CSMongo.Bson {
         /// <summary>
         /// Uses an anonymous type as a template for the values to return
         /// </summary>
-        public T Get<T>(T template) {
-            if (BsonAnonymousTypeParser.IsAnonymousType(template)) {
-                return BsonAnonymousTypeParser.PopulateAnonymousType<T>(this, template);
-            }
-            else {
-                return template;
-            }
+        public T Get<T>(T template)
+        {
+            return BsonAnonymousTypeParser.IsAnonymousType(template) ? BsonAnonymousTypeParser.PopulateAnonymousType(this, template) : template;
         }
 
+        /// <summary>
+        /// Uses an anonymous type as a template for the values to return
+        /// </summary>
+        public T GetWithId<T>(T template,string idField)
+        {
+            return BsonAnonymousTypeParser.IsAnonymousType(template) ? BsonAnonymousTypeParser.PopulateAnonymousTypeWithId(this, template,idField) : template;
+        }
         /// <summary>
         /// Handles getting the value from this DynamicCObject
         /// </summary>
@@ -563,7 +575,6 @@ namespace CSMongo.Bson {
 
             //generate all of the bytes required
             foreach (KeyValuePair<string, MongoDataType> item in this._Fields) {
-
                 //render the bytes for this request
                 using (MemoryStream output = new MemoryStream()) {
                     using (BinaryWriter writer = new BinaryWriter(output)) {

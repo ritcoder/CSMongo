@@ -134,7 +134,7 @@ namespace CSMongo {
         /// Appends a document to monitor for changes and updates
         /// </summary>
         public void UpdateOnSubmit(MongoDocument document) {
-            this.UpdateOnSubmit((new MongoDocument[] { document }).AsEnumerable());
+            this.UpdateOnSubmit((new[] { document }).AsEnumerable());
         }
 
         /// <summary>

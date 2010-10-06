@@ -81,7 +81,7 @@ namespace CSMongo.Bson {
         public override byte[] ToBsonByteArray() {
 
             //create the default size
-            DynamicStream stream = new DynamicStream(5);
+            var stream = new DynamicStream(5);
 
             //generate the bytes
             stream.InsertAt(4, base.ToBsonByteArray());

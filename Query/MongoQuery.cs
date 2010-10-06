@@ -129,6 +129,30 @@ namespace CSMongo.Query {
         }
 
         /// <summary>
+        /// Finds all records that have fields with values equal to that of the document provided
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        public MongoQuery EqualTo(MongoDocument doc)
+        {
+            foreach (var name in doc.GetFieldNames())
+            {
+                AppendParameter(name,null, doc.Get(name));
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Finds all records that have fields with values equal to that off the docuemtn provided
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public MongoQuery EqualTo(object o)
+        {
+            return o == null ? this : EqualTo(new MongoDocument(o));
+        }
+
+        /// <summary>
         /// Finds a record based on the Oid value
         /// </summary>
         public MongoQuery FindById(string id) {

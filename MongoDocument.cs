@@ -108,7 +108,7 @@ namespace CSMongo {
             get {
 
                 //if no id has been generated, do it now
-                MongoOid id = this.Get<MongoOid>(Mongo.DocumentIdKey, null);
+                var id = this.Get<MongoOid>(Mongo.DocumentIdKey, null);
                 if (id == null) {
                     id = new MongoOid();
                     this.Set(Mongo.DocumentIdKey, id);
@@ -127,7 +127,7 @@ namespace CSMongo {
                 }
 
                 //update the value
-                this.Set<MongoOid>(Mongo.DocumentIdKey, value); 
+                this.Set(Mongo.DocumentIdKey, value); 
 
             }
         }

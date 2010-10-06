@@ -78,7 +78,7 @@
     <Compile Include="DataTypes\MongoBinaryType.cs" />
     <Compile Include="DataTypes\MongoBooleanType.cs" />
     <Compile Include="DataTypes\MongoDataType.cs" />
-    <Compile Include="Helpers\Mongo.cs" />
+    <Compile Include="Mongo.cs" />
     <Compile Include="MongoCursor.cs" />
     <Compile Include="Bson\BsonMongoFieldReference.cs" />
     <Compile Include="DataTypes\MongoDate.cs" />

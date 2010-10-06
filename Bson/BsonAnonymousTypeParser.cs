@@ -17,8 +17,9 @@ namespace CSMongo.Bson {
         /// <summary>
         /// Creates a new parser for the provided information
         /// </summary>
-        public BsonAnonymousTypeParser(BsonObject data) {
+        public BsonAnonymousTypeParser(BsonObject data,string idField="_id") {
             this._Data = data;
+            _idField = idField;
         }
 
         #endregion
@@ -26,8 +27,8 @@ namespace CSMongo.Bson {
         #region Fields
 
         //houses the information to use
-        private BsonObject _Data;
-
+        private readonly BsonObject _Data;
+        private string _idField;
         #endregion
 
         #region Parsing
@@ -39,30 +40,36 @@ namespace CSMongo.Bson {
         public object ReadType(string parent, object section) {
 
             //create a list of values for the constructor
-            List<object> values = new List<object>();
+            var values = new List<object>();
 
             //and also get this type so we know how to create a
             //new instance using the constructor
-            Type type = section.GetType();
+            var type = section.GetType();
 
             //start checking each of the properties
             foreach (PropertyInfo property in type.GetProperties()) {
 
                 //get the path to the value in the document 
                 //but only if this isn't the first set
-                string path = string.IsNullOrEmpty(parent)
+                var path = string.IsNullOrEmpty(parent)
                     ? property.Name
                     : string.Concat(parent, ".", property.Name);
 
                 //get the value to use
-                object value = property.GetValue(section, null);
+                var value = property.GetValue(section, null);
 
                 //if this is anonymous type, parse it
-                if (BsonAnonymousTypeParser.IsAnonymousType(value)) {
+                if (IsAnonymousType(value)) {
                     value = this.ReadType(path, value);
                 }
+                //try to extract the id value
+                else if (path.Equals(_idField))
+                {
+                    value = ((MongoOid) _Data.Get("_id")).GetId();
+                }
                 //if it is not, check to see if there is an existing value
-                else {
+                else
+                {
 
                     //try and get the value to use
                     value = this._Data.Get(path, value);
@@ -120,10 +127,18 @@ namespace CSMongo.Bson {
         /// Attempts to assign the values of a BsonObject into new Anonymous Type values
         /// </summary>
         public static T PopulateAnonymousType<T>(BsonObject data, string parent, T template) {
-            BsonAnonymousTypeParser parser = new BsonAnonymousTypeParser(data);
+            var parser = new BsonAnonymousTypeParser(data);
             return (T)parser.ReadType(parent, template);
         }
 
+        /// <summary>
+        /// Attempts to assign the values of a BsonObject into new Anonymous Type values. It attempted to extract the id as well
+        /// </summary>
+        public static T PopulateAnonymousTypeWithId<T>(BsonObject data, T template,string idField)
+        {
+            var parser = new BsonAnonymousTypeParser(data,idField);
+            return (T)parser.ReadType(string.Empty, template);
+        }
         #endregion
 
     }

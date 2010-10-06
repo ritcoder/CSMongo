@@ -13,26 +13,31 @@ namespace CSMongo.Extensions.Queries {
         /// <summary>
         /// Selects information from the document in a specific format
         /// </summary>
-        public static IEnumerable<T> As<T>(this IEnumerable<MongoDocument> documents, T template) {
-            foreach (MongoDocument document in documents) {
-                yield return document.Get(template);
-            }
+        public static IEnumerable<T> As<T>(this IEnumerable<MongoDocument> documents, T template)
+        {
+            return documents.Select(document => document.Get(template));
         }
 
         /// <summary>
         /// Selects information from the document in a specific format
         /// </summary>
-        public static IEnumerable<T> As<T>(this IEnumerable<MongoDocument> documents, string start, T template) {
-            foreach (MongoDocument document in documents) {
-                yield return document.Get(start, template);
-            }
+        public static IEnumerable<T> AsWithId<T>(this IEnumerable<MongoDocument> documents, T template, string idField = "Id")
+        {
+            return documents.Select(document => document.GetWithId(template, idField));
+        }
+        /// <summary>
+        /// Selects information from the document in a specific format
+        /// </summary>
+        public static IEnumerable<T> As<T>(this IEnumerable<MongoDocument> documents, string start, T template)
+        {
+            return documents.Select(document => document.Get(start, template));
         }
 
         /// <summary>
         /// Selects information from the document in a specific format
         /// </summary>
         public static IEnumerable<MongoDocument> Apply(this IEnumerable<MongoDocument> documents, object parameters) {
-            foreach(MongoDocument document in documents) {
+            foreach(var document in documents) {
                 document.Merge(parameters);
                 yield return document;
             }
