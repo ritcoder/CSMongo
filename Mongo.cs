@@ -26,6 +26,10 @@ namespace CSMongo {
         public static readonly string DocumentIdKey = "_id";
 
         /// <summary>
+        /// The default field name that holds the search criteria for an upsert
+        /// </summary>
+        public static readonly string UpsertKey = "_upsert";
+        /// <summary>
         /// Null value to use when creating new anonymous types
         /// since you can't assign null directly
         /// </summary>

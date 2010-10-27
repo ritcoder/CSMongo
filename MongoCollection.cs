@@ -9,6 +9,7 @@ using CSMongo.Commands;
 using CSMongo.Results;
 using CSMongo.Query;
 using CSMongo.Bson;
+using CSMongo.Types;
 
 namespace CSMongo {
 
@@ -33,6 +34,7 @@ namespace CSMongo {
             this._Inserts = new List<MongoDocument>();
             this._Deletes = new List<MongoDocument>();
             this._Updates = new List<KeyValuePair<string, MongoDocument>>();
+            _Upserts = new List<KeyValuePair<string, MongoDocument>>();
         }
 
         #endregion
@@ -62,16 +64,75 @@ namespace CSMongo {
 
         //document with a hashcode to track changes
         internal List<KeyValuePair<string, MongoDocument>> _Updates;
+        internal List<KeyValuePair<string, MongoDocument>> _Upserts;
+
+        #endregion
+
+        #region Helper query procs
+        /// <summary>
+        /// Gets the first document that matches the given filter
+        /// </summary>
+        /// <param name="filter">The filter.</param>
+        /// <returns></returns>
+        public MongoDocument First(IDictionary<string,string> filter=null)
+        {
+            var query = FindAll(filter);
+            return query.SelectOne();
+        }
+        /// <summary>
+        /// Gets the first object after applying the filter and converts it to the given object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="refObj">The ref obj.</param>
+        /// <param name="filter">The filter.</param>
+        /// <param name="idField">The id field.</param>
+        /// <returns></returns>
+        public T First<T>(T refObj,IDictionary<string,string> filter=null,string idField="id") where T:class
+        {
+            var first = First(filter);
+            return first == null ? null : first.GetWithId(refObj,idField);
+        }
+
+        /// <summary>
+        /// Gets the first item with the given id and converts it to an object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="id">The id.</param>
+        /// <param name="refObj">The ref obj.</param>
+        /// <param name="idField">The id field.</param>
+        /// <returns></returns>
+        public T First<T>(string id,T refObj,string idField="id") where T:class
+        {
+            var instance = Find().FindById(id).SelectOne();
+            return instance == null ? null : instance.GetWithId(refObj, idField);
+        }
 
         #endregion
 
         #region Query Records
+        /// <summary>
+        /// Starts a new query for this collection and appends the added filter
+        /// </summary>
+        /// <param name="filter">The filter.</param>
+        /// <returns></returns>
+        public MongoQuery FindAll(IDictionary<string,string> filter)
+        {
+            var query = Find();
+            if (filter != null)
+            {
+                foreach (var kvp in filter)
+                {
+                    query.EqualTo(kvp.Key, kvp.Value);
+                }
+            }
+            return query;
+        }
 
         /// <summary>
         /// Starts a new query for this collection
         /// </summary>
         public MongoQuery Find() {
-            return this.Find<MongoQuery>();
+            return Find<MongoQuery>();
         }
 
         /// <summary>
@@ -134,7 +195,7 @@ namespace CSMongo {
         /// Appends a document to monitor for changes and updates
         /// </summary>
         public void UpdateOnSubmit(MongoDocument document) {
-            this.UpdateOnSubmit((new[] { document }).AsEnumerable());
+            UpdateOnSubmit((new[] { document }).AsEnumerable());
         }
 
         /// <summary>
@@ -143,14 +204,42 @@ namespace CSMongo {
         public void UpdateOnSubmit(IEnumerable<MongoDocument> documents) {
 
             //append each of the items to the updates
-            foreach (MongoDocument update in documents) {
-                if (this._Updates.Any(item => item.Equals(update))) { return; }
-                this._Updates.Add(new KeyValuePair<string, MongoDocument>(update.GetObjectHash(), update));
+            foreach (var update in documents) {
+                if (_Updates.Any(item => item.Value.Equals(update))) { return; }
+                _Updates.Add(new KeyValuePair<string, MongoDocument>(update.GetObjectHash(), update));
             }
-
-
         }
 
+        /// <summary>
+        /// Inserts the document if not found else it is updated
+        /// </summary>
+        /// <param name="document">The document to upsert. It must have a field called _upsert</param>
+        public void UpsertOnSubmit(MongoDocument document)
+        {
+            UpsertOnSubmit(new[]{document});
+        }
+        /// <summary>
+        /// Inserts the documents if not found else it is updated
+        /// </summary>
+        /// <param name="documents">The documents to upsert</param>
+        public void UpsertOnSubmit(IEnumerable<MongoDocument> documents)
+        {
+            foreach (var doc in documents)
+            {
+                var key = new BsonDocument();
+                var upsertKey = doc[Mongo.UpsertKey];
+                if (upsertKey is string)
+                {
+                    key[(string)upsertKey] = doc[(string)upsertKey];
+                }
+                else
+                    key.Merge((BsonDocument)upsertKey);
+                doc[Mongo.UpsertKey] = key;
+                var hash = key.GetObjectHash();
+                if (_Upserts.Any(item => item.Key.Equals(hash))) { return;}
+                _Upserts.Add(new KeyValuePair<string, MongoDocument>(hash,doc));
+            }
+        }
         #endregion
 
         #region Submitting Changes
@@ -164,12 +253,13 @@ namespace CSMongo {
             if (this._Inserts.Count > 0) { this._PerformInserts(); }
             if (this._Updates.Count > 0) { this._PerformUpdates(); }
             if (this._Deletes.Count > 0) { this._PerformDeletes(); }
+            if (_Upserts.Count > 0)  {  _PerformUpserts(); }
 
             //then clear the lists
             this._Inserts = new List<MongoDocument>();
             this._Updates = new List<KeyValuePair<string, MongoDocument>>();
             this._Deletes = new List<MongoDocument>();
-
+            _Upserts = new List<KeyValuePair<string, MongoDocument>>();
         }
 
         //handles inserting records waiting
@@ -181,7 +271,6 @@ namespace CSMongo {
 
         //handles updating records that are changed
         private void _PerformUpdates() {
-
             //check for changed items and update them now
             foreach (KeyValuePair<string, MongoDocument> item in this._Updates) {
 
@@ -216,6 +305,33 @@ namespace CSMongo {
 
             }
             
+        }
+
+        //handles updating records that are changed
+        private void _PerformUpserts()
+        {
+
+            //check for changed items and update them now
+            foreach (var item in this._Upserts)
+            {
+
+                //create a bson document of the update to create
+                var update = new BsonDocument();
+                update.Merge(item.Value);
+
+                var key = (BsonDocument)update[Mongo.UpsertKey]; 
+                update.Remove(Mongo.DocumentIdKey);
+                update.Remove(Mongo.UpsertKey);
+                key.Remove(Mongo.DocumentIdKey);
+
+
+                var request = new UpdateRequest(this) {Options = UpdateOptionTypes.Upsert};
+                request.Modifications["$set"] = update;
+                request.Parameters.Merge(key);
+                Database.SendRequest(request);
+
+            }
+
         }
 
         //handles deleting records that need to be removed
@@ -258,6 +374,33 @@ namespace CSMongo {
 
         #endregion
 
+        #region Commands
+        /// <summary>
+        /// Gets the next id. This is used for auto incrementing values.
+        /// This was inspired by the post @ http://shiflett.org/blog/2010/jul/auto-increment-with-mongodb
+        /// </summary>
+        /// <param name="increment">The incremental value.</param>
+        /// <param name="idField">The id field.</param>
+        /// <param name="idsTable">The name of the collection that holds the counts.</param>
+        /// <returns></returns>
+        public long GetNextId(long increment=1L,string idField="lastId",string idsTable = "TableIds")
+        {
+            var p = new FindAndModifyParameters
+                        {
+                            associatedTable = idsTable,
+                            query = new BsonDocument(new {name = Name}),
+                            returnUpdatedValues = true,
+                            upsert = true,
+                            update = new BsonDocument().AppendField("$inc", new BsonDocument(new {lastId = increment}))
+                        };
+            if (!p.Run(Database))
+            {
+                //todo: what do we do here?
+                return -1;
+            }
+            return p.responseDoc.Get<long>(idField);
+        }
+        #endregion
     }
 
 }

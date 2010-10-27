@@ -72,7 +72,7 @@ namespace CSMongo.Bson {
                 {
 
                     //try and get the value to use
-                    value = this._Data.Get(path, value);
+                    value = _Data.Get(path, value);
                 }
 
                 //add this to the list of values

@@ -52,16 +52,32 @@ namespace CSMongo.DataTypes {
         /// Handles assigning a value to a field
         /// </summary>
         public virtual void Set<T>(T value) {
-            this.Value = this.ConvertValue<T>(value);
+            Value = ConvertValue<T>(value);
         }
 
         /// <summary>
         /// Handles returning a value in the requested type
         /// </summary>
         public virtual object Get<T>() {
-            return this.ConvertValue<T>(this.Value);
+            return ConvertValue<T>(Value);
         }
 
+        /// <summary>
+        /// Gets the specified type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public virtual  object Get(Type type)
+        {
+            try
+            {
+                return Convert.ChangeType(Value,type);
+            }
+            catch
+            {
+                return null;
+            }
+        }
         /// <summary>
         /// Handles converting the passed in value to the base 
         /// type for this Mongo object

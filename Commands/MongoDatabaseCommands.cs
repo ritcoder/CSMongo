@@ -347,14 +347,14 @@ namespace CSMongo.Commands {
         /// Executes a command against the database using the provided information
         /// </summary>
         public static CommandResponse RunCommand(MongoDatabase database, object parameters) {
-            return MongoDatabaseCommands.RunCommand(database, new BsonObject(parameters));
+            return RunCommand(database, new BsonObject(parameters));
         }
 
         /// <summary>
         /// Executes a command against the database using the provided information
         /// </summary>
         public static CommandResponse RunCommand(MongoDatabase database, object parameters, bool expectResponse) {
-            return MongoDatabaseCommands.RunCommand(database, parameters, true);
+            return RunCommand(database, new BsonObject(parameters), true);
         }
 
         /// <summary>

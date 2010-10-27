@@ -133,6 +133,7 @@
     <Compile Include="Responses\QueryResponse.cs" />
     <Compile Include="Responses\ResponseBase.cs" />
     <Compile Include="Results\ProfileResult.cs" />
+    <Compile Include="Types\FindAndModifyParameters.cs" />
     <Compile Include="Types\MongoBinaryTypes.cs" />
     <Compile Include="Types\MongoDataTypes.cs" />
     <Compile Include="Types\OpCodeTypes.cs" />

@@ -40,8 +40,21 @@ namespace CSMongo.Query {
         #region Properties
 
         //the class that actually queries the database
-        private BsonDocument _Parameters;
+        private readonly BsonDocument _Parameters;
 
+        /// <summary>
+        /// Gets the query document. This document can be used for filtering.
+        /// </summary>
+        /// <value>The query document.</value>
+        public BsonDocument QueryDocument
+        {
+            get
+            {
+                var doc = new BsonDocument();
+                doc.Merge(_Parameters);
+                return doc;
+            }
+        }
         #endregion
 
         #region Query
@@ -52,8 +65,8 @@ namespace CSMongo.Query {
         public MongoQuery AppendParameter(string field, string modifier, object value) {
 
             //if using a modifier, set this as a document
-            if (modifier is string) {
-                BsonDocument parameters = new BsonDocument();
+            if (modifier != null) {
+                var parameters = new BsonDocument();
                 parameters[modifier] = value;
                 this._Parameters[field] = parameters;
             }
@@ -484,7 +497,36 @@ namespace CSMongo.Query {
         {
             _SendUpdate("$pull", UpdateOptionTypes.MultiUpdate, document);
         }
+        #endregion
 
+        #region Rename
+        /// <summary>
+        /// Renames the specified field.
+        /// </summary>
+        /// <param name="field">The field.</param>
+        /// <param name="newName">The new name.</param>
+        public void Rename(string field,string newName)
+        {
+            var doc = new BsonDocument();
+            doc[field] = newName;
+            Rename(doc);
+        }
+        /// <summary>
+        ///  Renames the fields in specified document.
+        /// </summary>
+        /// <param name="document">The document.</param>
+        public void Rename(object document)
+        {
+            Rename(new BsonDocument(document));
+        }
+        /// <summary>
+        /// Renames the fields in specified document.
+        /// </summary>
+        /// <param name="document">The document.</param>
+        public void Rename(BsonDocument document)
+        {
+            _SendUpdate("$rename",UpdateOptionTypes.MultiUpdate,document);
+        }
         #endregion
 
         #region Add To Set
@@ -637,6 +679,7 @@ namespace CSMongo.Query {
         }
         #endregion
 
+        #region Set
         /// <summary>
         /// Updates the matching record with with values provided or adds the new item to the object entirely
         /// </summary>
@@ -663,6 +706,7 @@ namespace CSMongo.Query {
         public void Set(BsonDocument document) {
             this._SendUpdate("$set", UpdateOptionTypes.MultiUpdate, document);
         }
+        #endregion
 
         /// <summary>
         /// Removes all matching fields from each document in the query
@@ -764,6 +808,19 @@ namespace CSMongo.Query {
 
         }
 
+        #endregion
+
+        #region Static
+        /// <summary>
+        /// Creates an instance of the mongo query with the collection set to null.
+        /// This has been added to allow generating query documents that can be used in other areas such as findAndReplace and upserts.
+        /// Only queries should be executed against this object. All updates, deletions, or selections will fail since there is not collection.
+        /// </summary>
+        /// <returns></returns>
+        public static MongoQuery CreateQueryInstance()
+        {
+            return new MongoQuery(null);
+        }
         #endregion
 
     }

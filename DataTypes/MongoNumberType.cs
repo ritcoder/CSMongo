@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using CSMongo.Bson;
 using System.IO;
 using CSMongo.Types;

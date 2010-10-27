@@ -97,7 +97,7 @@ namespace CSMongo.Bson {
         /// <summary>
         /// Uses an anonymous type as a template for the values to return
         /// </summary>
-        public T GetWithId<T>(T template,string idField)
+        public T GetWithId<T>(T template,string idField="id")
         {
             return BsonAnonymousTypeParser.IsAnonymousType(template) ? BsonAnonymousTypeParser.PopulateAnonymousTypeWithId(this, template,idField) : template;
         }
@@ -116,13 +116,14 @@ namespace CSMongo.Bson {
         }
 
         /// <summary>
-        /// Handles getting the value from this DynamicCObject
+        /// Handles getting the value from this DynamicCObject.
+        /// The convert function has been updated for arrays to help with the conversion
         /// </summary>
         public T Get<T>(string field, T @default) {
 
             //maps lower document levels
             if (BsonAnonymousTypeParser.IsAnonymousType(@default)) {
-                return BsonAnonymousTypeParser.PopulateAnonymousType<T>(this, field, @default);
+                return BsonAnonymousTypeParser.PopulateAnonymousType(this, field, @default);
             }
 
             //locate the field first
@@ -131,15 +132,31 @@ namespace CSMongo.Bson {
 
             //if nothing is found then just return the value
             try {
-                return detail.Field is MongoDataType
-                    ? (T)detail.Field.Get<T>()
-                    : @default;
+                if (detail.Field is MongoArrayType)
+                {
+                    var value = (object[])detail.Field.Get<T>(); //todo: can this be a document array as well?
+                    //todo: at the moment, only string arrays are supported. accomodate others
+                    if (value==null) return (T) (value as object);
+                    if (@default is string[])
+                    {
+                        //var output = new List<string>();
+                        var output = (object)value.Select(x => (string) Convert.ChangeType(x, typeof (string))).ToArray();
+                        return (T) output;
+                    }
+                    //if (value != null && null != @default) value = Convert.ChangeType(value, @default.GetType());
+                    return (T)(value as object);
+                }
+                if (detail.Field is MongoNumberType)
+                {
+                    var v = detail.Field.Get(@default.GetType()); //todo: what happens if @default is null
+                    return v == null ? @default : (T) v;
+                }
+                return (T) detail.Field.Get<T>();
             }
             //make sure they get some sort of value
             catch {
                 return @default;
             }
-
         }
 
         /// <summary>

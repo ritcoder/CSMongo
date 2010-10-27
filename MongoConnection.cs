@@ -135,9 +135,9 @@ namespace CSMongo {
             if (this.BeforeConnectionClosed != null) { this.BeforeConnectionClosed(this); }
 
             //close up all of the streams
-            if (this._Buffer is BufferedStream) { this._Buffer.Dispose(); }
-            if (this._Writer is BinaryWriter) { this._Writer.Close(); }
-            if (this._Client is TcpClient) { this._Client.Close(); }
+            if (_Buffer != null) { _Buffer.Dispose(); }
+            if (_Writer != null) { _Writer.Close(); }
+            if (_Client != null) { _Client.Close(); }
 
             //and then finally any event handling
             if (this.AfterConnectionClosed != null) { this.AfterConnectionClosed(this); }
@@ -181,7 +181,7 @@ namespace CSMongo {
                 catch { }
 
                 //and then forward the error for handling
-                throw up;
+                throw;
             }
             
 

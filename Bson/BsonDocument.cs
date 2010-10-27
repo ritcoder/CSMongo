@@ -135,6 +135,17 @@ namespace CSMongo.Bson {
 
         #endregion
 
+        /// <summary>
+        /// Appends the specified field and value to the document and returns the original collection.
+        /// </summary>
+        /// <param name="field">The field to set.</param>
+        /// <param name="document">The document to use as the value.</param>
+        /// <returns></returns>
+        public BsonDocument AppendField(string field, object document)
+        {
+            this[field] = document;
+            return this;
+        }
     }
 
 }

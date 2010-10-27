@@ -1,4 +1,9 @@
-﻿09/21/2010:
+﻿10/16/2010:
+1. Fixed an error with UpdateOnSubmit that allows the same document to be added multiple times
+2. Added Upsert
+3. Added Rename
+
+09/21/2010:
 1. Introduced AsWithId
 2. Edited BSonAnonymousParser to extract ids as well
 
@@ -9,6 +14,9 @@
 
 
 
+Incomplete or updates
+ReadType on BsonAnonymousTypeParser was updated to support arrays
+Generating from anonymous data returns string for integers
 
 
 Missing features
@@ -18,3 +26,4 @@ Missing features
 2. advanced queries
 3. Take an object to use as the filter parameter
 4. Take an object to be used as the property selector
+5. Convert document to a non anonymous object of type t
