@@ -27,3 +27,5 @@ Missing features
 3. Take an object to use as the filter parameter
 4. Take an object to be used as the property selector
 5. Convert document to a non anonymous object of type t
+
+

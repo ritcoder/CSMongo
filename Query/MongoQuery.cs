@@ -395,10 +395,10 @@ namespace CSMongo.Query {
         /// Selects the records from the database that matches this query
         /// </summary>
         public IEnumerable<MongoDocument> Select(int skip, int take, QueryOptionTypes options, params string[] fields) {
-            
+            if (fields==null) fields = new string[]{};
             //create the request to use
             QueryRequest request = new QueryRequest(this.Collection);
-            request.Fields.AddRange(fields);
+            request.Fields.AddRange(fields); //gives an error when fields is null
             request.Skip = skip;
             request.Take = take;
             request.Options = options;
@@ -820,6 +820,19 @@ namespace CSMongo.Query {
         public static MongoQuery CreateQueryInstance()
         {
             return new MongoQuery(null);
+        }
+        #endregion
+
+        #region Filtering
+        /// <summary>
+        /// Updates the parameters with those in the provided document
+        /// </summary>
+        /// <param name="doc">The doc.</param>
+        /// <returns></returns>
+        public MongoQuery SetFilter(BsonObject doc)
+        {
+            _Parameters.Merge(doc);
+            return this;
         }
         #endregion
 
