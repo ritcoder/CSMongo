@@ -25,7 +25,8 @@ namespace CSMongo.Query {
         /// </summary>
         public MongoQuery(MongoCollection collection)
             : base (collection) {
-            this._Parameters = new BsonDocument();
+            _Parameters = new BsonDocument();
+            _sortParameters = new BsonDocument();
         }
 
         /// <summary>
@@ -41,6 +42,7 @@ namespace CSMongo.Query {
 
         //the class that actually queries the database
         private readonly BsonDocument _Parameters;
+        private readonly BsonDocument _sortParameters;
 
         /// <summary>
         /// Gets the query document. This document can be used for filtering.
@@ -51,7 +53,14 @@ namespace CSMongo.Query {
             get
             {
                 var doc = new BsonDocument();
-                doc.Merge(_Parameters);
+                if (_sortParameters.FieldCount == 0)
+                    doc.Merge(_Parameters);
+                else
+                {
+                    doc["query"] = _Parameters;
+                    doc["orderby"] = _sortParameters;
+                }
+
                 return doc;
             }
         }
@@ -360,35 +369,35 @@ namespace CSMongo.Query {
         /// Selects the records from the database that matches this query
         /// </summary>
         public IEnumerable<MongoDocument> Select(int skip, int take) {
-            return this.Select(skip, take, QueryOptionTypes.None);
+            return Select(skip, take, QueryOptionTypes.None);
         }
 
         /// <summary>
         /// Selects the records from the database that matches this query
         /// </summary>
         public IEnumerable<MongoDocument> Select(QueryOptionTypes options) {
-            return this.Select(Mongo.DefaultSkipCount, Mongo.DefaultTakeCount, options);
+            return Select(Mongo.DefaultSkipCount, Mongo.DefaultTakeCount, options);
         }
 
         /// <summary>
         /// Selects the records from the database that matches this query
         /// </summary>
         public IEnumerable<MongoDocument> Select(params string[] fields) {
-            return this.Select(Mongo.DefaultSkipCount, Mongo.DefaultTakeCount, QueryOptionTypes.None, fields);
+            return Select(Mongo.DefaultSkipCount, Mongo.DefaultTakeCount, QueryOptionTypes.None, fields);
         }
 
         /// <summary>
         /// Selects the records from the database that matches this query
         /// </summary>
         public IEnumerable<MongoDocument> Select(int skip, int take, params string[] fields) {
-            return this.Select(skip, take, QueryOptionTypes.None, fields);
+            return Select(skip, take, QueryOptionTypes.None, fields);
         }
 
         /// <summary>
         /// Selects the records from the database that matches this query
         /// </summary>
         public IEnumerable<MongoDocument> Select(QueryOptionTypes options, params string[] fields) {
-            return this.Select(Mongo.DefaultSkipCount, Mongo.DefaultTakeCount, options, fields);
+            return Select(Mongo.DefaultSkipCount, Mongo.DefaultTakeCount, options, fields);
         }
 
         /// <summary>
@@ -397,20 +406,20 @@ namespace CSMongo.Query {
         public IEnumerable<MongoDocument> Select(int skip, int take, QueryOptionTypes options, params string[] fields) {
             if (fields==null) fields = new string[]{};
             //create the request to use
-            QueryRequest request = new QueryRequest(this.Collection);
+            var request = new QueryRequest(Collection);
             request.Fields.AddRange(fields); //gives an error when fields is null
             request.Skip = skip;
             request.Take = take;
             request.Options = options;
-            request.Parameters = this._Parameters;
+            request.Parameters = _Parameters;
 
             //send the request and get the response
-            QueryResponse response = this.Collection.Database.Connection
+            var response = this.Collection.Database.Connection
                 .SendRequest(request) as QueryResponse;
 
             //save this cursor for later
-            MongoCursor cursor = new MongoCursor(request, response.CursorId, response.TotalReturned);
-            this.Collection.Database.RegisterCursor(cursor);
+            var cursor = new MongoCursor(request, response.CursorId, response.TotalReturned);
+            Collection.Database.RegisterCursor(cursor);
 
             //and return the records
             IEnumerable<MongoDocument> documents = response.Documents.AsEnumerable();
@@ -714,9 +723,9 @@ namespace CSMongo.Query {
         public void Unset(params string[] fields) {
 
             //mark the fields to be removed
-            BsonDocument remove = new BsonDocument();
-            foreach (string field in fields) {
-                remove.Set<int>(field, 1);
+            var remove = new BsonDocument();
+            foreach (var field in fields) {
+                remove.Set(field, 1);
             }
 
             //send the command
@@ -730,13 +739,13 @@ namespace CSMongo.Query {
         public void Increment(params string[] fields) {
             
             //create the document
-            BsonDocument document = new BsonDocument{UseRawFieldNames = true};
+            var document = new BsonDocument{UseRawFieldNames = true};
             foreach (var field in fields) {
-                document.Set<int>(field, 1);
+                document.Set(field, 1);
             }
 
             //send the command
-            this.Increment(document);
+            Increment(document);
 
         }
 
@@ -757,7 +766,7 @@ namespace CSMongo.Query {
             //recast each to an integer value - I'm not sure
             //if any numeric type can be used in this instance
             foreach (var item in document.GetValues()) {
-                document.Set<int>(item.Key, document.Get<int>(item.Key, 1));
+                document.Set(item.Key, document.Get(item.Key, 1));
             }
 
             //send the update request
@@ -769,20 +778,22 @@ namespace CSMongo.Query {
         private void _SendUpdate(string type, UpdateOptionTypes options, BsonDocument changes) {
 
             //update the changes to actually make
-            BsonDocument document = new BsonDocument();
+            var document = new BsonDocument();
             document[type] = changes;
 
             //create the request to use
-            UpdateRequest request = new UpdateRequest(this.Collection);
-            request.Modifications = document;
-            request.Parameters = this._Parameters;
-            request.Options = options;
+            var request = new UpdateRequest(Collection)
+                              {
+                                  Modifications = document,
+                                  Parameters = _Parameters,
+                                  Options = options
+                              };
 
             //make sure something is found to change
             if (request.Modifications.FieldCount == 0) { return; }
 
             //send the request and get the response
-            this.Collection.Database.Connection.SendRequest(request);
+            Collection.Database.Connection.SendRequest(request);
 
         }
 
@@ -836,6 +847,17 @@ namespace CSMongo.Query {
         }
         #endregion
 
+        /// <summary>
+        /// Sorts the query results by the field prrovided.
+        /// </summary>
+        /// <param name="field">The field to sort by.</param>
+        /// <param name="ascending">if set to <c>true</c> sorting will be in [ascending] order.</param>
+        /// <returns></returns>
+        public MongoQuery SortBy(string field, bool ascending=true)
+        {
+            _sortParameters.Set(field, ascending ? 1 : -1);
+            return this;
+        }
     }
 
 }
