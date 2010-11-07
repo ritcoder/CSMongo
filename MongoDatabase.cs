@@ -483,6 +483,17 @@ namespace CSMongo {
 
         #endregion
 
+        #region DB Commands
+        /// <summary>
+        /// Lists the databases. The database used must be the admin database
+        /// </summary>
+        /// <returns></returns>
+        public DatabaseDetailResult[] ListDatabases()
+        {
+            //todo: add code contract
+            return MongoDatabaseCommands.ListDatabases(this).ToArray();
+        }
+        #endregion
         #region Working With Cursors
 
         /// <summary>

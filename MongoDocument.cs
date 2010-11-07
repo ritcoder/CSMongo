@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using CSMongo.Exceptions;
 using CSMongo.Bson;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using CSMongo.IO;
-using CSMongo.Types;
 using CSMongo.DataTypes;
 
 namespace CSMongo {
@@ -37,7 +31,8 @@ namespace CSMongo {
         /// Creates an empty MongoDocument with a default ID assigned
         /// </summary>
         public MongoDocument(bool generateId)
-            : this(false, null) {
+            : this(generateId, null)
+        {
         }
 
         /// <summary>
@@ -45,7 +40,7 @@ namespace CSMongo {
         /// </summary>
         public MongoDocument(bool generateId, object source)
             : base(source) {
-            if (generateId) { this.GenerateId(); }
+            if (generateId) { GenerateId(); }
         }
 
         #endregion

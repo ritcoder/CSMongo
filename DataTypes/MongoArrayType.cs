@@ -25,7 +25,7 @@ namespace CSMongo.DataTypes {
         /// Allows for collection based values regarless of content
         /// </summary>
         public override bool IsAllowedValue<T>(T value) {
-            return !(value is BsonObject) && (
+            return !(value is BsonObject || value is IDictionary) && (
                 value is IEnumerable ||
                 value is ICollection ||
                 value is IList

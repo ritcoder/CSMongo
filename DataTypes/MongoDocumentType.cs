@@ -33,8 +33,8 @@ namespace CSMongo.DataTypes {
         /// No conversions required for this object
         /// </summary>
         public override object Get<T>() {
-            BsonDocument document = this.Value as BsonDocument;
-            return document is BsonDocument ? document : new BsonDocument();
+            var document = this.Value as BsonDocument;
+            return document ?? new BsonDocument();
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace CSMongo.DataTypes {
         /// Writes the bytes for this document
         /// </summary>
         public override byte[] ToBson() {
-            BsonDocument document = this.Get<BsonDocument>() as BsonDocument;
+            var document = Get<BsonDocument>() as BsonDocument;
             return document.ToBsonByteArray();
         }
 

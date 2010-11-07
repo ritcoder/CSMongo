@@ -146,6 +146,20 @@ namespace CSMongo.Bson {
             this[field] = document;
             return this;
         }
+
+        /// <summary>
+        /// Attempts to recreate fields by appending @ in front of the name. This is to prevent the fieldname from splitting the field since the name contains a .
+        /// </summary>
+        /// <returns></returns>
+        public BsonDocument NormalizeCompoundFieldNames()
+        {
+            foreach (var name in GetFieldNames().Where(name => name.Contains(".") && !name.StartsWith("@")))
+            {
+                this["@@" + name] = this["@"+name];
+                Remove("@"+name);
+            }
+            return this;
+        }
     }
 
 }

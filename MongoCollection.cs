@@ -250,15 +250,15 @@ namespace CSMongo {
         public void SubmitChanges() {
 
             //check for changes
-            if (this._Inserts.Count > 0) { this._PerformInserts(); }
-            if (this._Updates.Count > 0) { this._PerformUpdates(); }
-            if (this._Deletes.Count > 0) { this._PerformDeletes(); }
+            if (_Inserts.Count > 0) { _PerformInserts(); }
+            if (_Updates.Count > 0) { _PerformUpdates(); }
+            if (_Deletes.Count > 0) { _PerformDeletes(); }
             if (_Upserts.Count > 0)  {  _PerformUpserts(); }
 
             //then clear the lists
-            this._Inserts = new List<MongoDocument>();
-            this._Updates = new List<KeyValuePair<string, MongoDocument>>();
-            this._Deletes = new List<MongoDocument>();
+            _Inserts = new List<MongoDocument>();
+            _Updates = new List<KeyValuePair<string, MongoDocument>>();
+            _Deletes = new List<MongoDocument>();
             _Upserts = new List<KeyValuePair<string, MongoDocument>>();
         }
 
@@ -272,13 +272,13 @@ namespace CSMongo {
         //handles updating records that are changed
         private void _PerformUpdates() {
             //check for changed items and update them now
-            foreach (KeyValuePair<string, MongoDocument> item in this._Updates) {
+            foreach (KeyValuePair<string, MongoDocument> item in _Updates) {
 
                 //if this hasn't changed then skip it
                 if (item.Key.Equals(item.Value.GetObjectHash())) { continue; }
 
-                //create a bson document of the update to create
-                BsonDocument update = new BsonDocument();
+                /*//create a bson document of the update to create
+                var update = new BsonDocument();
                 update.Merge(item.Value);
                 update.Remove(Mongo.DocumentIdKey);
 
@@ -286,10 +286,10 @@ namespace CSMongo {
                 this.Find().FindById(item.Value.Id).Set(update);
 
                 //check for anything removed
-                IEnumerable<string> removed = item.Value.GetRemovedFields();
+                var removed = item.Value.GetRemovedFields();
                 if (removed.Count() > 0) {
-                    this.Find().FindById(item.Value.Id).Unset(removed.ToArray());
-                }
+                    Find().FindById(item.Value.Id).Unset(removed.ToArray());
+                }*/
 
                 //Might want to try and merge this into the same
                 //request to avoid two trips to the database -- But
@@ -297,11 +297,11 @@ namespace CSMongo {
                 //the same database since an unset call would cause
                 //the inital set request to fail...
 
-                //UpdateRequest request = new UpdateRequest(this);
-                //request.Modifications["$set"] = item.Value;
-                //request.Modifications["$unset"] = item.Value.GetRemovedFields();
-                //request.Parameters["$in"] = new MongoOid[] { item.Value.Id };
-                //this.Database.SendRequest(request);
+                var request = new UpdateRequest(this);
+                request.Modifications["$set"] = item.Value;
+                request.Modifications["$unset"] = item.Value.GetRemovedFields();
+                request.Parameters["$in"] = new[] { item.Value.Id };
+                Database.SendRequest(request);
 
             }
             
@@ -399,6 +399,90 @@ namespace CSMongo {
                 return -1;
             }
             return p.responseDoc.Get<long>(idField);
+        }
+        /// <summary>
+        /// Upserts the document with the given key. This is done instantly. To queue until submission, use UpsertOnSubmit
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="doc"></param>
+        public void Upsert(BsonDocument doc,BsonDocument key)
+        {
+            var update = new BsonDocument();
+            update.Merge(doc);
+            update.Remove(Mongo.DocumentIdKey);
+            key.Remove(Mongo.DocumentIdKey);
+
+            var request = new UpdateRequest(this) { Options = UpdateOptionTypes.Upsert };
+            request.Modifications["$set"] = update;
+            request.Parameters.Merge(key);
+            Database.SendRequest(request);
+        }
+        /// <summary>
+        /// Upserts the specified doc. The keys are the property names.
+        /// </summary>
+        /// <param name="doc">The document to update</param>
+        /// <param name="keys">The keys.</param>
+        public void Upsert(BsonDocument doc,params string[] keys)
+        {
+            if (keys.Length==0) throw new ArgumentException("No key specified");
+            var key = new BsonDocument();
+            foreach (var k in keys)
+            {
+                key[k] = doc[k];
+            }
+            Upsert(doc, key);
+        }
+
+        /// <summary>
+        /// Updates all matching documents
+        /// </summary>
+        /// <param name="queryDoc"></param>
+        /// <param name="setDoc"></param>
+        /// <param name="unsetDoc"></param>
+        public void Update(BsonDocument queryDoc,BsonDocument setDoc,BsonDocument unsetDoc)
+        {
+            var request = new UpdateRequest(this) {Options = UpdateOptionTypes.MultiUpdate};
+            if (setDoc!=null) request.Modifications["$set"] = setDoc;
+            if (unsetDoc != null) request.Modifications["$unset"] = unsetDoc;
+            request.Parameters.Merge(queryDoc);
+            //request.Parameters["$in"] = new[] { item.Value.Id };
+            Database.SendRequest(request);
+            //Find().Set();
+            ////check for changed items and update them now
+            //foreach (KeyValuePair<string, MongoDocument> item in _Updates)
+            //{
+
+            //    //if this hasn't changed then skip it
+            //    if (item.Key.Equals(item.Value.GetObjectHash())) { continue; }
+
+            //    /*//create a bson document of the update to create
+            //    var update = new BsonDocument();
+            //    update.Merge(item.Value);
+            //    update.Remove(Mongo.DocumentIdKey);
+
+            //    //start with the update
+            //    this.Find().FindById(item.Value.Id).Set(update);
+
+            //    //check for anything removed
+            //    var removed = item.Value.GetRemovedFields();
+            //    if (removed.Count() > 0) {
+            //        Find().FindById(item.Value.Id).Unset(removed.ToArray());
+            //    }*/
+
+            //    //Might want to try and merge this into the same
+            //    //request to avoid two trips to the database -- But
+            //    //this might cause an issue with older versions of
+            //    //the same database since an unset call would cause
+            //    //the inital set request to fail...
+
+            //    var request = new UpdateRequest(this);
+            //    request.Modifications["$set"] = item.Value;
+            //    request.Modifications["$unset"] = item.Value.GetRemovedFields();
+            //    request.Parameters["$in"] = new[] { item.Value.Id };
+            //    Database.SendRequest(request);
+
+            //}
+
         }
         #endregion
     }

@@ -1,4 +1,8 @@
-﻿10/16/2010:
+﻿11/06/2010
+1. Added OrderBy
+
+
+10/16/2010:
 1. Fixed an error with UpdateOnSubmit that allows the same document to be added multiple times
 2. Added Upsert
 3. Added Rename
@@ -27,5 +31,7 @@ Missing features
 3. Take an object to use as the filter parameter
 4. Take an object to be used as the property selector
 5. Convert document to a non anonymous object of type t
+6. Add sorting to queries
+7. Add sorting, fields, upsert and remove arguments to FindAndModify
 
 

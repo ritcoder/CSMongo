@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace CSMongo.Types {
+﻿namespace CSMongo.Types {
 
     /// <summary>
     /// Options available when performing a query
     /// </summary>
-    public enum QueryOptionTypes : int {
+    public enum QueryOptionTypes
+    {
 
         None = 0,
         

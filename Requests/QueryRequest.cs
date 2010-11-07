@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using CSMongo.IO;
 using CSMongo.Types;
 using CSMongo.Bson;
 using System.IO;
 using CSMongo.Responses;
-using System.Text.RegularExpressions;
 
 namespace CSMongo.Requests {
 
@@ -30,11 +26,11 @@ namespace CSMongo.Requests {
         /// </summary>
         public QueryRequest(string database, string collection)
             : base(OpCodeTypes.Query, database, collection) {
-            this.Skip = 0;
-            this.Take = 0;
-            this.Fields = new List<string>();
-            this.Options = QueryOptionTypes.None;
-            this.Parameters = new BsonDocument();
+            Skip = 0;
+            Take = 0;
+            Fields = new List<string>();
+            Options = QueryOptionTypes.None;
+            Parameters = new BsonDocument();
         }
 
         #endregion
@@ -77,32 +73,29 @@ namespace CSMongo.Requests {
         protected override void GenerateBody(DynamicStream stream) {
 
             //determine the correct options to use
-            stream.Append(BsonTranslator.AsInt32((int)this.Options));
+            stream.Append(BsonTranslator.AsInt32((int)Options));
 
             //apply the collection and database
-            stream.Append(BsonTranslator.AsString(this.GetDatabaseTarget()));
+            stream.Append(BsonTranslator.AsString(GetDatabaseTarget()));
 
             //update the range information for this request
-            stream.Append(BsonTranslator.AsInt32(this.Skip));
-            stream.Append(BsonTranslator.AsInt32(this.Take));
+            stream.Append(BsonTranslator.AsInt32(Skip));
+            stream.Append(BsonTranslator.AsInt32(Take));
 
             //generate the query
-            stream.Append(this.Parameters.ToBsonByteArray());
+            stream.Append(Parameters.ToBsonByteArray());
 
             //generate the field selectors if there are any
-            if (this.Fields.Count > 0) {
-
-                //create the selector document
-                BsonDocument select = new BsonDocument();
-                for (int i = 0; i < this.Fields.Count; i++) {
-                    select.Set(this.Fields[i], i + 1);
-                }
-
-                //append the bytes
-                stream.Append(select.ToBsonByteArray());
-
+            if (Fields.Count <= 0) return;
+            var select = new BsonDocument();
+            for (var i = 0; i < Fields.Count; i++)
+            {
+                select.Set(Fields[i], i + 1);
             }
 
+            //append the bytes
+            stream.Append(select.ToBsonByteArray());
+            //create the selector document
         }
 
         /// <summary>

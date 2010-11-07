@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace CSMongo {
     
@@ -63,8 +60,8 @@ namespace CSMongo {
         /// from the previous request
         /// </summary>
         public static int DefaultGetMoreReturnCount {
-            get { return Mongo._DefaultGetMoreReturnCount; }
-            set { Mongo._DefaultGetMoreReturnCount = Math.Max(value, DEFAULT_RETURN_COUNT); }
+            get { return _DefaultGetMoreReturnCount; }
+            set { _DefaultGetMoreReturnCount = Math.Max(value, DEFAULT_RETURN_COUNT); }
         }
         private static int _DefaultGetMoreReturnCount = DEFAULT_RETURN_COUNT;
         private const int DEFAULT_RETURN_COUNT = 100;

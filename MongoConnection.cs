@@ -155,20 +155,20 @@ namespace CSMongo {
             try {
 
                 //perform normal checking
-                if (!this.Connected) {
+                if (!Connected) {
                     throw new ConnectionNotOpenedException("Connection isn't open yet!");
                 }
 
                 //send the header first
-                this._Writer.Write(request.GetHeader());
-                this._Writer.Flush();
+                _Writer.Write(request.GetHeader());
+                _Writer.Flush();
 
                 //then the rest of the content
-                this._Writer.Write(request.GetBody());
-                this._Writer.Flush();
+                _Writer.Write(request.GetBody());
+                _Writer.Flush();
 
                 //next, read for the response
-                return request.OnResponse(this._Buffer);
+                return request.OnResponse(_Buffer);
 
             }
             //forward the exception onto the caller
@@ -177,7 +177,7 @@ namespace CSMongo {
                 //attempt to kill the connection
                 //ignore any problems since we are
                 //already forwarding an exception
-                try { this.Dispose(); }
+                try { Dispose(); }
                 catch { }
 
                 //and then forward the error for handling

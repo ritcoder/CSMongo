@@ -321,7 +321,7 @@ namespace CSMongo.Bson {
         /// Merges this object with the provided DynamicObject
         /// </summary>
         public virtual void Merge(BsonDocument source) {
-            this.Merge(source as BsonObject);
+            Merge(source as BsonObject);
         }
 
         /// <summary>
@@ -329,16 +329,18 @@ namespace CSMongo.Bson {
         /// </summary>
         public virtual void Merge(BsonObject source) {
             foreach (var item in source._Fields) {
-                this.Set(item.Key, item.Value);
+                Set(item.Key, item.Value);
             }
         }
+
+
 
         /// <summary>
         /// Merges this object with the provided DynamicObject
         /// </summary>
         public virtual void Merge(Dictionary<string, object> source) {
             foreach (var item in source) {
-                this.Set(item.Key, item.Value);
+                Set(item.Key, item.Value);
             }
         }
 
@@ -346,23 +348,21 @@ namespace CSMongo.Bson {
         /// Removes the field provided
         /// </summary>
         public virtual void Remove(string field) {
-            this.Remove(new string[] { field });
+            Remove(new[] { field });
         }
 
         /// <summary>
         /// Removes each of the fields provided
         /// </summary>
-        public virtual void Remove(params string[] fields) {
-
+        public virtual void Remove(params string[] fields)
+        {
             //remove each field name from the correct area
-            this._Removed.AddRange(fields);
-            foreach(string field in fields) {
-                MongoFieldReference detail = this._FindField(field, false);
-                if (detail.Field is MongoDataType && detail.Parent is BsonObject) {
-                    detail.Parent._Fields.Remove(detail.Name);
-                }
+            _Removed.AddRange(fields);
+            foreach (var detail in
+                fields.Select(field => _FindField(field, false)).Where(detail => detail.Field != null && detail.Parent != null))
+            {
+                detail.Parent._Fields.Remove(detail.Name);
             }
-
         }
 
         #endregion
@@ -442,17 +442,28 @@ namespace CSMongo.Bson {
         private static void _Populate(BsonObject target, object source,bool ignoreNulls) {
             if (source == null) { return; }
             if (source is BsonObject) { return; }
-            
+
             //get the type information
             Type type = source.GetType();
             if (!type.IsClass) { return; }
 
+            //handle dictionaries differently
+            if (source is IDictionary)
+            {
+                var dict = source as IDictionary;
+                foreach (var a in dict.Keys)
+                {
+                    target.Set(a.ToString(),dict[a]);
+                   // target.Set(kvp.)
+                }
+                return;
+            }
             //find all of the properties and fields that can be read
             foreach (MemberInfo member in type.GetMembers()) {
 
                 //check for properties 
                 if (member is PropertyInfo) {
-                    PropertyInfo property = member as PropertyInfo;
+                    var property = member as PropertyInfo;
                     if (property.CanRead) {
                         var value = property.GetValue(source, null);
                         if (value == null && ignoreNulls) continue;
@@ -461,7 +472,7 @@ namespace CSMongo.Bson {
                 }
                 //and fields
                 else if (member is FieldInfo) {
-                    FieldInfo field = member as FieldInfo;
+                    var field = member as FieldInfo;
                     if (field.IsPublic) {
                         var value = field.GetValue(source);
                         if (value == null && ignoreNulls) continue;

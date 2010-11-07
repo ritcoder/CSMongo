@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
 using CSMongo.Exceptions;
 using CSMongo.Types;
@@ -16,7 +15,7 @@ namespace CSMongo.DataTypes {
         #region Static Properties
 
         //buillt in types that cannot be removed
-        private static readonly MongoDataType[] _BuiltIn = new MongoDataType[] {
+        private static readonly MongoDataType[] BuiltIn = new MongoDataType[] {
             new MongoNullType(),
             new MongoOidType(),
             new MongoStringType(),
@@ -122,18 +121,16 @@ namespace CSMongo.DataTypes {
         /// <summary>
         /// Handles finding the correct data type for a value
         /// </summary>
-        public static MongoDataType FindTypeFor(object value) {
-
+        public static MongoDataType FindTypeFor(object value)
+        {
             //check each type for a valid handler
-            foreach (MongoDataType type in MongoDataType._Custom.Union(MongoDataType._BuiltIn)) {
-                if (type.IsAllowedValue(value)) {
-                    return Activator.CreateInstance(type.GetType()) as MongoDataType;
-                }
+            foreach (var type in _Custom.Union(BuiltIn).Where(type => type.IsAllowedValue(value)))
+            {
+                return Activator.CreateInstance(type.GetType()) as MongoDataType;
             }
 
             //if no conversion was found, just render as a null value
             return new MongoNullType();
-
         }
 
         /// <summary>
@@ -142,26 +139,26 @@ namespace CSMongo.DataTypes {
         public static void RegisterMongoDataType<T>() where T : MongoDataType {
 
             //make sure this isn't already added
-            if (MongoDataType.IsTypeRegistered<T>()) {
+            if (IsTypeRegistered<T>()) {
                 throw new MongoTypeAlreadyRegisteredException(typeof(T));
             }
 
             //add the instance
-            MongoDataType._Custom.Add(Activator.CreateInstance<T>());
+            _Custom.Add(Activator.CreateInstance<T>());
         }
 
         /// <summary>
         /// Unregisters a type from the MongoData
         /// </summary>
         public static void UnregisterMongoDataType<T>() where T : MongoDataType {
-            MongoDataType._Custom.RemoveAll(item => item is T);
+            _Custom.RemoveAll(item => item is T);
         }
 
         /// <summary>
         /// Returns if any of the current registered types matches the incoming type
         /// </summary>
         private static bool IsTypeRegistered<T>() {
-            return MongoDataType._Custom.Union(MongoDataType._BuiltIn).Any(item => item is T);
+            return _Custom.Union(BuiltIn).Any(item => item is T);
         }
 
         #endregion
