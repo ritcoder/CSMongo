@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using CSMongo.IO;
 using System.IO;
 
@@ -14,8 +12,8 @@ namespace CSMongo.Bson {
 
         #region Constants
 
-        private const int DOCUMENT_LENGTH_COUNT = 4;
-        private const int DOCUMENT_TERMINATOR_COUNT = 1;
+        private const int DocumentLengthCount = 4;
+        private const int DocumentTerminatorCount = 1;
 
         #endregion
 
@@ -25,7 +23,7 @@ namespace CSMongo.Bson {
         /// Creates a new empty BSON document
         /// </summary>
         public BsonDocument()
-            : base() {
+        {
         }
 
         /// <summary>
@@ -104,28 +102,28 @@ namespace CSMongo.Bson {
         public static BsonDocument FromStream(Stream stream) {
 
             //read the first byte to determine the type
-            BinaryReader reader = new BinaryReader(stream);
+            var reader = new BinaryReader(stream);
 
             //get the length of this document and the amount
             //that should be read into the parsing stream.
             //removes 4 bytes to account for the length value
             //and an additional 1 byte to account for the
             //terminator value
-            int length = reader.ReadInt32();
-            int read = length - (DOCUMENT_LENGTH_COUNT + DOCUMENT_TERMINATOR_COUNT);
+            var length = reader.ReadInt32();
+            int read = length - (DocumentLengthCount + DocumentTerminatorCount);
 
             //read out the bytes to use and the terminator
-            byte[] bytes = reader.ReadBytes(read);
+            var bytes = reader.ReadBytes(read);
             reader.ReadByte();
 
             //use the bytes to generate the document
-            using (MemoryStream content = new MemoryStream(bytes)) {
+            using (var content = new MemoryStream(bytes)) {
 
                 //read the content
                 Dictionary<string, object> values = BsonTranslator.FromStream(content);
 
                 //fill and return the object
-                BsonDocument document = new BsonDocument();
+                var document = new BsonDocument();
                 document.Merge(values);
                 return document;
 

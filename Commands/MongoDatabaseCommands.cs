@@ -111,7 +111,7 @@ namespace CSMongo.Commands {
         /// Deletes a database from the server
         /// </summary>
         public static MethodResult DropDatabase(MongoDatabase database) {
-            CommandResponse result = MongoDatabaseCommands.RunCommand(database, new { dropDatabase = Mongo.CommandArgument });
+            CommandResponse result = RunCommand(database, new { dropDatabase = Mongo.CommandArgument });
             return new MethodResult(result.GetDefaultResponse());
         }
 
@@ -119,7 +119,7 @@ namespace CSMongo.Commands {
         /// Attempts to repair the current database
         /// </summary>
         public static MethodResult RepairDatabase(MongoDatabase database, bool preserveClonedOnFailure, bool backupOriginal) {
-            CommandResponse result = MongoDatabaseCommands.RunCommand(database, new { repairDatabase = Mongo.CommandArgument, preserveClonedFilesOnFailure = preserveClonedOnFailure, backupOriginalFiles = backupOriginal });
+            CommandResponse result = RunCommand(database, new { repairDatabase = Mongo.CommandArgument, preserveClonedFilesOnFailure = preserveClonedOnFailure, backupOriginalFiles = backupOriginal });
             return new MethodResult(result.GetDefaultResponse());
         }
 
@@ -127,7 +127,7 @@ namespace CSMongo.Commands {
         /// Returns assert info for the database ??
         /// </summary>
         public static MethodResult GetAssertInfo(MongoDatabase database) {
-            CommandResponse result = MongoDatabaseCommands.RunCommand(database, new { assertinfo = Mongo.DefaultAdminDatabase });
+            CommandResponse result = RunCommand(database, new { assertinfo = Mongo.DefaultAdminDatabase });
             return new MethodResult(result.GetDefaultResponse());
         }
 
@@ -175,7 +175,7 @@ namespace CSMongo.Commands {
         /// that meet the criteria for the query 
         /// </summary>
         public static CollectionCountResult CollectionCount(MongoDatabase database, string collection, BsonDocument query) {
-            CommandResponse result = MongoDatabaseCommands.RunCommand(database, new { count = collection, query = query });
+            CommandResponse result = RunCommand(database, new { count = collection, query });
             return new CollectionCountResult(result.GetDefaultResponse());
         }
 
@@ -361,7 +361,7 @@ namespace CSMongo.Commands {
         /// Executes a command against the database using the provided information
         /// </summary>
         public static CommandResponse RunCommand(MongoDatabase database, BsonObject parameters) {
-            return MongoDatabaseCommands.RunCommand(database, parameters, true);
+            return RunCommand(database, parameters, true);
         }
 
         /// <summary>
@@ -370,11 +370,11 @@ namespace CSMongo.Commands {
         public static CommandResponse RunCommand(MongoDatabase database, BsonObject parameters, bool expectResponse) {
 
             //create the command to use
-            CommandRequest request = new CommandRequest(database);
+            var request = new CommandRequest(database);
             request.Arguments.Merge(parameters);
 
             //send the command and check for the result
-            CommandResponse response = database.SendRequest(request) as CommandResponse;
+            var response = database.SendRequest(request) as CommandResponse;
             if (response == null && expectResponse) {
                 throw new MongoServerException(
                     string.Format(

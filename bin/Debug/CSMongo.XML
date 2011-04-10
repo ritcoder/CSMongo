@@ -206,6 +206,13 @@
             Handles returning a value in the requested type
             </summary>
         </member>
+        <member name="M:CSMongo.DataTypes.MongoDataType.Get(System.Type)">
+            <summary>
+            Gets the specified type.
+            </summary>
+            <param name="type">The type.</param>
+            <returns></returns>
+        </member>
         <member name="M:CSMongo.DataTypes.MongoDataType.ConvertValue``1(System.Object)">
             <summary>
             Handles converting the passed in value to the base 
@@ -270,60 +277,6 @@
         <member name="M:CSMongo.DataTypes.MongoObjectType.ToBson">
             <summary>
             
-            </summary>
-        </member>
-        <member name="T:CSMongo.Mongo">
-            <summary>
-            Default properties and values for Mongo
-            </summary>
-        </member>
-        <member name="F:CSMongo.Mongo.DefaultTakeCount">
-            <summary>
-            The default number to use when creating a query for the take value
-            </summary>
-        </member>
-        <member name="F:CSMongo.Mongo.DefaultSkipCount">
-            <summary>
-            The default number to use when creating a query for the skip value
-            </summary>
-        </member>
-        <member name="F:CSMongo.Mongo.DocumentIdKey">
-            <summary>
-            The default ID value used for ObjectIds with a Mongo Document
-            </summary>
-        </member>
-        <member name="F:CSMongo.Mongo.Null">
-            <summary>
-            Null value to use when creating new anonymous types
-            since you can't assign null directly
-            </summary>
-        </member>
-        <member name="F:CSMongo.Mongo.Epoch">
-            <summary>
-            The starting value to use when calculating dates
-            </summary>
-        </member>
-        <member name="F:CSMongo.Mongo.CommandArgument">
-            <summary>
-            The number that most commands use as the value for the 
-            name of the method that is being run in on the server
-            </summary>
-        </member>
-        <member name="F:CSMongo.Mongo.DefaultPort">
-            <summary>
-            The default port that Mongo uses for database connections
-            </summary>
-        </member>
-        <member name="F:CSMongo.Mongo.DefaultAdminDatabase">
-            <summary>
-            The name of the Mongo database to default to 
-            </summary>
-        </member>
-        <member name="P:CSMongo.Mongo.DefaultGetMoreReturnCount">
-            <summary>
-            The default number of records to return on a GetMore
-            request if no count is provided and cannot be determined
-            from the previous request
             </summary>
         </member>
         <member name="T:CSMongo.DataTypes.SmallEnumeratedType">
@@ -567,6 +520,11 @@
             Creates a new request for the specified type
             </summary>
         </member>
+        <member name="F:CSMongo.Requests.RequestBase._output">
+            <summary>
+            the container for the stream to write
+            </summary>
+        </member>
         <member name="M:CSMongo.Requests.RequestBase.Reset">
             <summary>
             Resets the bytes for this request
@@ -586,6 +544,13 @@
             <summary>
             Required function to generate the content for sending
             </summary>
+        </member>
+        <member name="M:CSMongo.Requests.RequestBase.OnResponse(System.IO.Stream)">
+            <summary>
+            optional method to read a return stream from the 
+            </summary>
+            <param name="stream"></param>
+            <returns></returns>
         </member>
         <member name="M:CSMongo.Requests.RequestBase.OnBeforeGenerateStream">
             <summary>
@@ -688,7 +653,18 @@
             Creates a new DynamicObject using the provided type as a template
             </summary>
         </member>
+        <member name="M:CSMongo.Bson.BsonObject.GetFieldNames">
+            <summary>
+            Gets the field names in this type
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CSMongo.Bson.BsonObject.Get``1(``0)">
+            <summary>
+            Uses an anonymous type as a template for the values to return
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonObject.GetWithId``1(``0,System.String)">
             <summary>
             Uses an anonymous type as a template for the values to return
             </summary>
@@ -705,7 +681,8 @@
         </member>
         <member name="M:CSMongo.Bson.BsonObject.Get``1(System.String,``0)">
             <summary>
-            Handles getting the value from this DynamicCObject
+            Handles getting the value from this DynamicCObject.
+            The convert function has been updated for arrays to help with the conversion
             </summary>
         </member>
         <member name="M:CSMongo.Bson.BsonObject.Set(System.String,System.Object)">
@@ -1027,6 +1004,12 @@
             Options available when performing a query
             </summary>
         </member>
+        <member name="P:CSMongo.Types.FindAndModifyParameters.returnUpdatedValues">
+            <summary>
+            Gets or sets a value indicating whether the updates values are returned. Defaults to false
+            </summary>
+            <value><c>true</c> if update  values must be returned; otherwise, <c>false</c>.</value>
+        </member>
         <member name="T:CSMongo.Results.GetPreviousErrorResult">
             <summary>
             Returns about a previous error on the server
@@ -1221,6 +1204,20 @@
             <summary>
             Reads an incoming BSON document from a stream
             </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonDocument.AppendField(System.String,System.Object)">
+            <summary>
+            Appends the specified field and value to the document and returns the original collection.
+            </summary>
+            <param name="field">The field to set.</param>
+            <param name="document">The document to use as the value.</param>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.Bson.BsonDocument.NormalizeCompoundFieldNames">
+            <summary>
+            Attempts to recreate fields by appending @ in front of the name. This is to prevent the fieldname from splitting the field since the name contains a .
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:CSMongo.Bson.BsonOrderedDocument.#ctor">
             <summary>
@@ -1454,6 +1451,65 @@
             Reads the value from a stream
             </summary>
         </member>
+        <member name="T:CSMongo.Mongo">
+            <summary>
+            Default properties and values for Mongo
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.DefaultTakeCount">
+            <summary>
+            The default number to use when creating a query for the take value
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.DefaultSkipCount">
+            <summary>
+            The default number to use when creating a query for the skip value
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.DocumentIdKey">
+            <summary>
+            The default ID value used for ObjectIds with a Mongo Document
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.UpsertKey">
+            <summary>
+            The default field name that holds the search criteria for an upsert
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.Null">
+            <summary>
+            Null value to use when creating new anonymous types
+            since you can't assign null directly
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.Epoch">
+            <summary>
+            The starting value to use when calculating dates
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.CommandArgument">
+            <summary>
+            The number that most commands use as the value for the 
+            name of the method that is being run in on the server
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.DefaultPort">
+            <summary>
+            The default port that Mongo uses for database connections
+            </summary>
+        </member>
+        <member name="F:CSMongo.Mongo.DefaultAdminDatabase">
+            <summary>
+            The name of the Mongo database to default to 
+            </summary>
+        </member>
+        <member name="P:CSMongo.Mongo.DefaultGetMoreReturnCount">
+            <summary>
+            The default number of records to return on a GetMore
+            request if no count is provided and cannot be determined
+            from the previous request
+            </summary>
+        </member>
         <member name="T:CSMongo.Query.MongoQuery">
             <summary>
             Handles building a query and generating records
@@ -1523,6 +1579,20 @@
             <summary>
             Finds all records that are equal to the value provided
             </summary>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.EqualTo(CSMongo.MongoDocument)">
+            <summary>
+            Finds all records that have fields with values equal to that of the document provided
+            </summary>
+            <param name="doc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.EqualTo(System.Object)">
+            <summary>
+            Finds all records that have fields with values equal to that off the docuemtn provided
+            </summary>
+            <param name="o"></param>
+            <returns></returns>
         </member>
         <member name="M:CSMongo.Query.MongoQuery.FindById(System.String)">
             <summary>
@@ -1727,6 +1797,25 @@
             </summary>
             <param name="document"></param>
         </member>
+        <member name="M:CSMongo.Query.MongoQuery.Rename(System.String,System.String)">
+            <summary>
+            Renames the specified field.
+            </summary>
+            <param name="field">The field.</param>
+            <param name="newName">The new name.</param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Rename(System.Object)">
+            <summary>
+             Renames the fields in specified document.
+            </summary>
+            <param name="document">The document.</param>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Rename(CSMongo.Bson.BsonDocument)">
+            <summary>
+            Renames the fields in specified document.
+            </summary>
+            <param name="document">The document.</param>
+        </member>
         <member name="M:CSMongo.Query.MongoQuery.AddToSet(System.String,System.Object)">
             <summary>
             Adds value to the array only if its not in the array already.
@@ -1861,6 +1950,80 @@
             Performs a selection of all fields matching the query
             </summary>
         </member>
+        <member name="M:CSMongo.Query.MongoQuery.CreateQueryInstance">
+            <summary>
+            Creates an instance of the mongo query with the collection set to null.
+            This has been added to allow generating query documents that can be used in other areas such as findAndReplace and upserts.
+            Only queries should be executed against this object. All updates, deletions, or selections will fail since there is not collection.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.SetFilter(CSMongo.Bson.BsonObject)">
+            <summary>
+            Updates the parameters with those in the provided document
+            </summary>
+            <param name="doc">The doc.</param>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.SortBy(System.String,System.Boolean)">
+            <summary>
+            Sorts the query results by the field prrovided.
+            </summary>
+            <param name="field">The field to sort by.</param>
+            <param name="ascending">if set to <c>true</c> sorting will be in [ascending] order.</param>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.MapReduce(System.String,System.String,CSMongo.Types.MapReduceParameters,System.Int32)">
+            <summary>
+            Runs M/R on the given collection
+            </summary>
+            <param name="map">the map statements/ funcation</param>
+            <param name="reduce">the reduce statements or functions</param>
+            <param name="p">the parameters</param>
+            <param name="limit">Limits the number of documents processed</param>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Distinct``1(System.String,System.Boolean)">
+            <summary>
+            The distinct command returns returns a list of distinct values for the given key across a collection
+            If an error occurs, null is returned. the exact error is not stored anywhere.
+            </summary>
+            <typeparam name="T">The type of the objects in the array</typeparam>
+            <param name="key">the key field to use</param>
+            <param name="sort">true to sort the final list</param>
+            <returns>The list of distinct values</returns>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Group(System.Object,System.Object,System.String,System.String)">
+            <summary>
+            Group returns an array of grouped items. The command is similar to SQL's group by
+            </summary>
+            <param name="key">The key parameter. If it is a string, it will be treated as a javascript function</param>
+            <param name="initial"></param>
+            <param name="reduce"></param>
+            <param name="finalize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Sum(System.String[])">
+            <summary>
+            Computes the sum of multiple fields
+            </summary>
+            <param name="fields"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.Query.MongoQuery.Sum``1(System.String)">
+            <summary>
+            Computes the sum of the given field
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="P:CSMongo.Query.MongoQuery.QueryDocument">
+            <summary>
+            Gets the query document. This document can be used for filtering.
+            </summary>
+            <value>The query document.</value>
+        </member>
         <member name="T:CSMongo.MongoOid">
             <summary>
             Represents an ID number to use for MongoOids
@@ -1930,6 +2093,40 @@
             the same collection
             </summary>
         </member>
+        <member name="M:CSMongo.MongoCollection.First(System.Collections.Generic.IDictionary{System.String,System.String})">
+            <summary>
+            Gets the first document that matches the given filter
+            </summary>
+            <param name="filter">The filter.</param>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.MongoCollection.First``1(``0,System.Collections.Generic.IDictionary{System.String,System.String},System.String)">
+            <summary>
+            Gets the first object after applying the filter and converts it to the given object
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="refObj">The ref obj.</param>
+            <param name="filter">The filter.</param>
+            <param name="idField">The id field.</param>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.MongoCollection.First``1(System.String,``0,System.String)">
+            <summary>
+            Gets the first item with the given id and converts it to an object
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="id">The id.</param>
+            <param name="refObj">The ref obj.</param>
+            <param name="idField">The id field.</param>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.MongoCollection.FindAll(System.Collections.Generic.IDictionary{System.String,System.String})">
+            <summary>
+            Starts a new query for this collection and appends the added filter
+            </summary>
+            <param name="filter">The filter.</param>
+            <returns></returns>
+        </member>
         <member name="M:CSMongo.MongoCollection.Find">
             <summary>
             Starts a new query for this collection
@@ -1980,6 +2177,18 @@
             Appends a document to monitor for changes and updates
             </summary>
         </member>
+        <member name="M:CSMongo.MongoCollection.UpsertOnSubmit(CSMongo.MongoDocument)">
+            <summary>
+            Inserts the document if not found else it is updated
+            </summary>
+            <param name="document">The document to upsert. It must have a field called _upsert</param>
+        </member>
+        <member name="M:CSMongo.MongoCollection.UpsertOnSubmit(System.Collections.Generic.IEnumerable{CSMongo.MongoDocument})">
+            <summary>
+            Inserts the documents if not found else it is updated
+            </summary>
+            <param name="documents">The documents to upsert</param>
+        </member>
         <member name="M:CSMongo.MongoCollection.SubmitChanges">
             <summary>
             Handles updating changes for the database
@@ -2004,6 +2213,47 @@
             <summary>
             Removes the specified index from this collection
             </summary>
+        </member>
+        <member name="M:CSMongo.MongoCollection.MapReduce(System.String,System.String,CSMongo.Types.MapReduceParameters)">
+            <summary>
+            Runs M/R on the given collection
+            </summary>
+            <param name="map">the map statements/ funcation</param>
+            <param name="reduce">the reduce statements or functions</param>
+            <param name="p">the parameters</param>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.MongoCollection.GetNextId(System.Int64,System.String,System.String)">
+            <summary>
+            Gets the next id. This is used for auto incrementing values.
+            This was inspired by the post @ http://shiflett.org/blog/2010/jul/auto-increment-with-mongodb
+            </summary>
+            <param name="increment">The incremental value.</param>
+            <param name="idField">The id field.</param>
+            <param name="idsTable">The name of the collection that holds the counts.</param>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.MongoCollection.Upsert(CSMongo.Bson.BsonDocument,CSMongo.Bson.BsonDocument)">
+            <summary>
+            Upserts the document with the given key. This is done instantly. To queue until submission, use UpsertOnSubmit
+            </summary>
+            <param name="key"></param>
+            <param name="doc"></param>
+        </member>
+        <member name="M:CSMongo.MongoCollection.Upsert(CSMongo.Bson.BsonDocument,System.String[])">
+            <summary>
+            Upserts the specified doc. The keys are the property names.
+            </summary>
+            <param name="doc">The document to update</param>
+            <param name="keys">The keys.</param>
+        </member>
+        <member name="M:CSMongo.MongoCollection.Update(CSMongo.Bson.BsonDocument,CSMongo.Bson.BsonDocument,CSMongo.Bson.BsonDocument)">
+            <summary>
+            Updates all matching documents
+            </summary>
+            <param name="queryDoc"></param>
+            <param name="setDoc"></param>
+            <param name="unsetDoc"></param>
         </member>
         <member name="P:CSMongo.MongoCollection.Name">
             <summary>
@@ -2214,6 +2464,11 @@
             Selects information from the document in a specific format
             </summary>
         </member>
+        <member name="M:CSMongo.Extensions.Queries.MongoQueryExtensions.AsWithId``1(System.Collections.Generic.IEnumerable{CSMongo.Bson.BsonDocument},``0,System.String)">
+            <summary>
+            Selects information from the document in a specific format
+            </summary>
+        </member>
         <member name="M:CSMongo.Extensions.Queries.MongoQueryExtensions.As``1(System.Collections.Generic.IEnumerable{CSMongo.MongoDocument},System.String,``0)">
             <summary>
             Selects information from the document in a specific format
@@ -2400,6 +2655,13 @@
             Writes a date in BSON format
             </summary>
         </member>
+        <member name="M:CSMongo.Bson.BsonTranslator.AsRegex(System.Text.RegularExpressions.Regex)">
+            <summary>
+            Writes a regex in BSON format
+            </summary>
+            <param name="value">The regex instance</param>
+            <returns>regex as bson byte arrray</returns>
+        </member>
         <member name="M:CSMongo.Bson.BsonTranslator.ReadRegularExpression(System.IO.Stream)">
             <summary>
             Reads a regular expression from the stream
@@ -2473,6 +2735,120 @@
         <member name="M:CSMongo.Exceptions.MissingCollectionNameException.#ctor(System.String)">
             <summary>
             Throws that a collection name was not found
+            </summary>
+        </member>
+        <member name="T:CSMongo.Types.MapReduceParameters">
+            <summary>
+            Parameters for executing map/reduce functions
+            </summary>
+        </member>
+        <member name="M:CSMongo.Types.MapReduceParameters.#ctor">
+            <summary>
+            Sets <c>wrapFunctions</c> to true and keyFieldName to key
+            </summary>
+        </member>
+        <member name="M:CSMongo.Types.MapReduceParameters.Build">
+            <summary>
+            Creates a document for the command execution
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CSMongo.Types.MapReduceParameters.Run(CSMongo.MongoDatabase)">
+            <summary>
+            Executes the command and returned the output documents
+            </summary>
+            <param name="db">The db to execute the command on</param>
+            <returns></returns>
+        </member>
+        <member name="P:CSMongo.Types.MapReduceParameters.mapreduce">
+            <summary>
+            Name of the collection to reduce
+            </summary>
+        </member>
+        <member name="P:CSMongo.Types.MapReduceParameters.wrapFunctions">
+            <summary>
+            True to treat all functions as statements and thus to wrap the function around it.
+            </summary>
+        </member>
+        <member name="P:CSMongo.Types.MapReduceParameters.map">
+            <summary>
+            The map function references the variable this to inspect the current object under consideration. 
+            A map function calls emit(key,value) any number of times to feed data to the reducer. 
+            In most cases you will emit once per input document, but in some cases such as counting tags, a given document may have one, many, or even zero tags. 
+            Each emit is limited to 50% of the maximum document size (e.g. 4MB for 1.6.x and 8MB for 1.8.x)
+            () -> ()
+            </summary>
+        </member>
+        <member name="P:CSMongo.Types.MapReduceParameters.reduce">
+            <summary>
+            the reduce function will receive an array of emitted values and reduce them to a single value
+            (k,vs) -> v
+            </summary>
+        </member>
+        <member name="P:CSMongo.Types.MapReduceParameters.keyFieldName">
+            <summary>
+            Name to use as the key. This is used to update the final document
+            </summary>
+        </member>
+        <member name="P:CSMongo.Types.MapReduceParameters.finalize">
+            <summary>
+            function to apply to all the results when finished
+            (k,v) -> v
+            </summary>
+        </member>
+        <member name="P:CSMongo.Types.MapReduceParameters.query">
+            <summary>
+            query filter object
+            </summary>
+        </member>
+        <member name="P:CSMongo.Types.MapReduceParameters.sort">
+            <summary>
+            sort the query.  useful for optimization
+            </summary>
+        </member>
+        <member name="P:CSMongo.Types.MapReduceParameters.limit">
+            <summary>
+            number of objects to return from collection
+            </summary>
+        </member>
+        <member name="P:CSMongo.Types.MapReduceParameters.out">
+            <summary>
+            The out parameter
+            </summary>
+        </member>
+        <member name="T:CSMongo.Types.MapReduceParameters.MapReduceResultDocument">
+            <summary>
+            Represents the out parameter of the request
+            </summary>
+        </member>
+        <member name="P:CSMongo.Types.MapReduceParameters.MapReduceResultDocument.inline">
+            <summary>
+            With this option, no collection will be created, and the whole map-reduce operation will happen in RAM. 
+            Also, the results of the map-reduce will be returned within the result object. 
+            This option is possible only when the result set fits within the 16MB limit of a single document.
+            </summary>
+        </member>
+        <member name="P:CSMongo.Types.MapReduceParameters.MapReduceResultDocument.replace">
+            <summary>
+            the output will replace any existing output collection with the same name
+            </summary>
+        </member>
+        <member name="P:CSMongo.Types.MapReduceParameters.MapReduceResultDocument.reduce">
+            <summary>
+            If documents exists for a given key in the result set and in the old collection, 
+            then a reduce operation (using the specified reduce function) will be performed on the two values and the result will 
+            be written to the output collection. If a finalize function was provided, this will be run after the reduce as well
+            </summary>
+        </member>
+        <member name="P:CSMongo.Types.MapReduceParameters.MapReduceResultDocument.db">
+            <summary>
+            The name of the db to use if not the default
+            </summary>
+        </member>
+        <member name="P:CSMongo.Types.MapReduceParameters.MapReduceResultDocument.merge">
+            <summary>
+            This option will merge new data into the old output collection. 
+            In other words, if the same key exists in both the result set and the old collection, the new key will overwrite the old one
             </summary>
         </member>
         <member name="T:CSMongo.Responses.CommandResponse">
@@ -2722,6 +3098,12 @@
             Authenticates this request with the provided username and password
             </summary>
         </member>
+        <member name="M:CSMongo.MongoDatabase.ListDatabases">
+            <summary>
+            Lists the databases. The database used must be the admin database
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CSMongo.MongoDatabase.GetLastCursor">
             <summary>
             Returns the most recently entered cursor
@@ -2810,7 +3192,7 @@
             Returns access to a collection
             </summary>
         </member>
-        <member name="M:CSMongo.Bson.BsonAnonymousTypeParser.#ctor(CSMongo.Bson.BsonObject)">
+        <member name="M:CSMongo.Bson.BsonAnonymousTypeParser.#ctor(CSMongo.Bson.BsonObject,System.String)">
             <summary>
             Creates a new parser for the provided information
             </summary>
@@ -2829,6 +3211,11 @@
         <member name="M:CSMongo.Bson.BsonAnonymousTypeParser.PopulateAnonymousType``1(CSMongo.Bson.BsonObject,System.String,``0)">
             <summary>
             Attempts to assign the values of a BsonObject into new Anonymous Type values
+            </summary>
+        </member>
+        <member name="M:CSMongo.Bson.BsonAnonymousTypeParser.PopulateAnonymousTypeWithId``1(CSMongo.Bson.BsonObject,``0,System.String)">
+            <summary>
+            Attempts to assign the values of a BsonObject into new Anonymous Type values. It attempted to extract the id as well
             </summary>
         </member>
         <member name="F:CSMongo.Types.OpCodeTypes.GetByOid">
@@ -3007,6 +3394,31 @@
             <summary>
             Throws that the provided connection stirng is not
             in an acceptable format
+            </summary>
+        </member>
+        <member name="T:CSMongo.DataTypes.MongoRegexType">
+            <summary>
+            Regular expression data type
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoRegexType.GetDataType">
+            <summary>
+            Used to determine the Mongo Op code for this type
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoRegexType.IsAllowedValue``1(``0)">
+            <summary>
+            Determines if this type can be cast into the requested type
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoRegexType.ToBson">
+            <summary>
+            Writes a value to BSON format
+            </summary>
+        </member>
+        <member name="M:CSMongo.DataTypes.MongoRegexType.FromBsonStream(System.IO.Stream)">
+            <summary>
+            Handles reading the content to find the value of an object
             </summary>
         </member>
         <member name="T:CSMongo.Results.CollectionCountResult">

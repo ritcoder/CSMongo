@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
 using CSMongo.Types;
 using CSMongo.IO;
@@ -16,11 +13,11 @@ namespace CSMongo.Requests {
 
         #region Constants
 
-        private const int DEFAULT_HEADER_LENGTH = 16;
-        private const int POSITION_REQUEST_LENGTH = 0;
-        private const int POSITION_REQUEST_ID = 4;
-        private const int POSITION_RESPONSE_ID = 8;
-        private const int POSITION_OP_CODE = 12;
+        private const int DefaultHeaderLength = 16;
+        private const int PositionRequestLength = 0;
+        private const int PositionRequestId = 4;
+        private const int PositionResponseId = 8;
+        private const int PositionOpCode = 12;
 
         #endregion
 
@@ -29,8 +26,8 @@ namespace CSMongo.Requests {
         /// <summary>
         /// Creates a new request for the specified type
         /// </summary>
-        public RequestBase(OpCodeTypes code) {
-            this.OpCode = code;
+        protected RequestBase(OpCodeTypes code) {
+            OpCode = code;
         }
 
         #endregion
@@ -41,7 +38,7 @@ namespace CSMongo.Requests {
         /// Gets the current length of this request
         /// </summary>
         public int RequestLength {
-            get { return this._Output.Length; }
+            get { return _output.Length; }
         }
 
         /// <summary>
@@ -59,38 +56,40 @@ namespace CSMongo.Requests {
         /// </summary>
         public int ResponseId { get; set; }
 
-        //the container for the stream to write
-        private DynamicStream _Output;
+        /// <summary>
+        /// the container for the stream to write
+        /// </summary>
+        private DynamicStream _output;
 
         #endregion
 
         #region Methods
 
         //generates the entire request
-        private void _GenerateStream() {
+        private void GenerateStream() {
 
             //if the stream has already been created then don't bother
-            if (this._Output is DynamicStream) { return; }
+            if (_output != null) { return; }
 
             //called just before the generation starts
-            this.OnBeforeGenerateStream();
+            OnBeforeGenerateStream();
 
             //start building the header
-            DynamicStream stream = new DynamicStream(DEFAULT_HEADER_LENGTH);
-            stream.WriteAt(POSITION_OP_CODE, BitConverter.GetBytes((int)this.OpCode));
+            var stream = new DynamicStream(DefaultHeaderLength);
+            stream.WriteAt(PositionOpCode, BitConverter.GetBytes((int)OpCode));
 
             //generate the bytes to use for the body
-            this.GenerateBody(stream);
+            GenerateBody(stream);
 
             //update the request/response IDs incase they change when building
-            stream.WriteAt(POSITION_REQUEST_ID, BitConverter.GetBytes(this.RequestId));
-            stream.WriteAt(POSITION_RESPONSE_ID, BitConverter.GetBytes(this.ResponseId));
+            stream.WriteAt(PositionRequestId, BitConverter.GetBytes(RequestId));
+            stream.WriteAt(PositionResponseId, BitConverter.GetBytes(ResponseId));
 
             //finally, remember to update the length
-            stream.WriteAt(POSITION_REQUEST_LENGTH, BitConverter.GetBytes(stream.Length));
+            stream.WriteAt(PositionRequestLength, BitConverter.GetBytes(stream.Length));
 
             //cache this value to use it later
-            this._Output = stream;
+            _output = stream;
 
         }
 
@@ -98,23 +97,23 @@ namespace CSMongo.Requests {
         /// Resets the bytes for this request
         /// </summary>
         public void Reset() {
-            this._Output = null;
+            _output = null;
         }
 
         /// <summary>
         /// Returns the bytes to send as a header for this request
         /// </summary>
         public byte[] GetHeader() {
-            this._GenerateStream();
-            return this._Output.Read(0, DEFAULT_HEADER_LENGTH);
+            GenerateStream();
+            return _output.Read(0, DefaultHeaderLength);
         }
 
         /// <summary>
         /// Returns the bytes that should be sent as a header
         /// </summary>
         public byte[] GetBody() {
-            this._GenerateStream();
-            return this._Output.Read(DEFAULT_HEADER_LENGTH, this._Output.Length - DEFAULT_HEADER_LENGTH);
+            GenerateStream();
+            return _output.Read(DefaultHeaderLength, _output.Length - DefaultHeaderLength);
         }
 
         #endregion
@@ -130,7 +129,11 @@ namespace CSMongo.Requests {
 
         #region Optional Methods
 
-        //optional method to read a return stream from the 
+        /// <summary>
+        /// optional method to read a return stream from the 
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
         public virtual ResponseBase OnResponse(Stream stream) {
             return null;
         }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CSMongo.Types;
+﻿using CSMongo.Types;
 using System.IO;
 using CSMongo.Bson;
 
@@ -31,7 +27,7 @@ namespace CSMongo.DataTypes {
         /// Handles reading the bytes from the request
         /// </summary>
         public override byte[] ToBson() {
-            return BsonTranslator.AsBinary(this.Value as byte[] ?? new byte[] { });
+            return BsonTranslator.AsBinary(Value as byte[] ?? new byte[] { });
         }
 
         /// <summary>
@@ -49,13 +45,13 @@ namespace CSMongo.DataTypes {
             T fallback = default(T);
 
             //if just wanting the byte array, return it as is
-            if (fallback is byte[] && this.Value is byte[]) {
-                return this.Value as byte[];
+            if (fallback is byte[] && Value is byte[]) {
+                return Value as byte[];
             }
 
             //if not, try and deserialize it
             try {
-                return BsonObject.Deserialize(this.Value as byte[]);
+                return BsonObject.Deserialize(Value as byte[]);
             }
             catch {
                 return fallback;
@@ -68,10 +64,10 @@ namespace CSMongo.DataTypes {
         /// </summary>
         public override void Set<T>(T value) {
             if (value is byte[]) {
-                this.Value = value;
+                Value = value;
             }
             else {
-                this.Value = BsonObject.Serialize(value);
+                Value = BsonObject.Serialize(value);
             }
         }
 

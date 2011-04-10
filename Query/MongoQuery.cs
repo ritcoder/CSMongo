@@ -25,7 +25,7 @@ namespace CSMongo.Query {
         /// </summary>
         public MongoQuery(MongoCollection collection)
             : base (collection) {
-            _Parameters = new BsonDocument();
+            _parameters = new BsonDocument();
             _sortParameters = new BsonDocument();
         }
 
@@ -41,7 +41,7 @@ namespace CSMongo.Query {
         #region Properties
 
         //the class that actually queries the database
-        private readonly BsonDocument _Parameters;
+        private readonly BsonDocument _parameters;
         private readonly BsonDocument _sortParameters;
 
         /// <summary>
@@ -54,10 +54,10 @@ namespace CSMongo.Query {
             {
                 var doc = new BsonDocument();
                 if (_sortParameters.FieldCount == 0)
-                    doc.Merge(_Parameters);
+                    doc.Merge(_parameters);
                 else
                 {
-                    doc["query"] = _Parameters;
+                    doc["query"] = _parameters;
                     doc["orderby"] = _sortParameters;
                 }
 
@@ -77,11 +77,11 @@ namespace CSMongo.Query {
             if (modifier != null) {
                 var parameters = new BsonDocument();
                 parameters[modifier] = value;
-                this._Parameters[field] = parameters;
+                _parameters[field] = parameters;
             }
             //otherwise, just assign the value
             else {
-                this._Parameters[field] = value;
+                _parameters[field] = value;
             }
 
             //return the query to use
@@ -93,7 +93,7 @@ namespace CSMongo.Query {
         /// Writes a manual function to persom a comparison on the server
         /// </summary>
         public MongoQuery Where(string script) {
-            return this.Where(script, false);
+            return Where(script, false);
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace CSMongo.Query {
             }
 
             //write the query for the user
-            this._Parameters["$where"] = script;
+            _parameters["$where"] = script;
 
             //update the assignments
             return this;
@@ -118,21 +118,21 @@ namespace CSMongo.Query {
         /// Finds all records that match the provided expression
         /// </summary>
         public MongoQuery Match(string field, Regex expression) {
-            return this.AppendParameter(field, null, expression);
+            return AppendParameter(field, null, expression);
         }
 
         /// <summary>
         /// Finds all records that match the provided expression
         /// </summary>
         public MongoQuery Match(string field, string expression) {
-            return this.Match(field, new Regex(expression, RegexOptions.None));
+            return Match(field, new Regex(expression, RegexOptions.None));
         }
 
         /// <summary>
         /// Finds all records that match the provided expression
         /// </summary>
         public MongoQuery Match(string field, string expression, RegexOptions options) {
-            return this.Match(field, new Regex(expression, options));
+            return Match(field, new Regex(expression, options));
         }
 
         /// <summary>
@@ -142,11 +142,11 @@ namespace CSMongo.Query {
 
             //just in case they tried to use EqualTo for finding an id
             if (field.Equals(Mongo.DocumentIdKey) && value is MongoOid) {
-                return this.FindById(value as MongoOid);
+                return FindById(value as MongoOid);
             }
 
             //otherwise, just do the default step
-            return this.AppendParameter(field, null, value);
+            return AppendParameter(field, null, value);
 
         }
 
@@ -348,21 +348,21 @@ namespace CSMongo.Query {
         /// Selects only one document with the provided parameters
         /// </summary>
         public MongoDocument SelectOne(int skip, params string[] fields ) {
-            return this.SelectOne(skip, QueryOptionTypes.None, fields);
+            return SelectOne(skip, QueryOptionTypes.None, fields);
         }
 
         /// <summary>
         /// Selects only one document with the provided parameters
         /// </summary>
         public MongoDocument SelectOne(int skip, QueryOptionTypes options, params string[] fields) {
-            return this.Select(skip, 1, options, fields).FirstOrDefault();
+            return Select(skip, 1, options, fields).FirstOrDefault();
         }
 
         /// <summary>
         /// Selects the records from the database that matches this query
         /// </summary>
         public IEnumerable<MongoDocument> Select() {
-            return this.Select(Mongo.DefaultSkipCount, Mongo.DefaultTakeCount, QueryOptionTypes.None);
+            return Select(Mongo.DefaultSkipCount, Mongo.DefaultTakeCount, QueryOptionTypes.None);
         }
 
         /// <summary>
@@ -404,17 +404,18 @@ namespace CSMongo.Query {
         /// Selects the records from the database that matches this query
         /// </summary>
         public IEnumerable<MongoDocument> Select(int skip, int take, QueryOptionTypes options, params string[] fields) {
-            if (fields==null) fields = new string[]{};
+            //todo: this is just a temp entry to fix the 101 limit on returned query count
+            if (take <= 0) take = 10000000;
             //create the request to use
             var request = new QueryRequest(Collection);
-            request.Fields.AddRange(fields); //gives an error when fields is null
+            if (fields!=null) request.Fields.AddRange(fields); 
             request.Skip = skip;
             request.Take = take;
             request.Options = options;
-            request.Parameters = _Parameters;
+            request.Parameters = QueryDocument;
 
             //send the request and get the response
-            var response = this.Collection.Database.Connection
+            var response = Collection.Database.Connection
                 .SendRequest(request) as QueryResponse;
 
             //save this cursor for later
@@ -423,7 +424,7 @@ namespace CSMongo.Query {
 
             //and return the records
             IEnumerable<MongoDocument> documents = response.Documents.AsEnumerable();
-            this.Collection.UpdateOnSubmit(documents);
+            Collection.UpdateOnSubmit(documents);
             return documents;
 
         }
@@ -435,9 +436,9 @@ namespace CSMongo.Query {
 
             //request the count using the current parameters
             CollectionCountResult count = MongoDatabaseCommands.CollectionCount(
-                this.Collection.Database, 
-                this.Collection.Name, 
-                this._Parameters
+                Collection.Database, 
+                Collection.Name, 
+                _parameters
                 );
             return count.TotalDocuments;
 
@@ -785,7 +786,7 @@ namespace CSMongo.Query {
             var request = new UpdateRequest(Collection)
                               {
                                   Modifications = document,
-                                  Parameters = _Parameters,
+                                  Parameters = _parameters,
                                   Options = options
                               };
 
@@ -812,7 +813,7 @@ namespace CSMongo.Query {
 
             //create the request to use
             DeleteRequest request = new DeleteRequest(this.Collection);
-            request.Parameters = this._Parameters;
+            request.Parameters = this._parameters;
 
             //send the delete request
             this.Collection.Database.Connection.SendRequest(request);
@@ -842,7 +843,8 @@ namespace CSMongo.Query {
         /// <returns></returns>
         public MongoQuery SetFilter(BsonObject doc)
         {
-            _Parameters.Merge(doc);
+            if (doc == null) return this;
+            _parameters.Merge(doc);
             return this;
         }
         #endregion
@@ -857,6 +859,125 @@ namespace CSMongo.Query {
         {
             _sortParameters.Set(field, ascending ? 1 : -1);
             return this;
+        }
+
+        public MongoQuery SortBy(BsonDocument doc)
+        {
+            if (doc != null)
+            {
+                _sortParameters.Merge(doc);
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Runs M/R on the given collection
+        /// </summary>
+        /// <param name="map">the map statements/ funcation</param>
+        /// <param name="reduce">the reduce statements or functions</param>
+        /// <param name="p">the parameters</param>
+        /// <param name="limit">Limits the number of documents processed</param>
+        /// <returns></returns>
+        public List<BsonDocument> MapReduce(string map, string reduce, MapReduceParameters p=null,int limit=0)
+        {
+            if (p == null) p = new MapReduceParameters { keyFieldName = "key" };
+            var doc = QueryDocument;
+            if (doc.Has("query"))
+            {
+                p.query = doc["query"] as BsonDocument;
+                p.sort = doc["orderby"] as BsonDocument;
+            }
+            else
+            {
+                p.query = doc;
+            }
+            if (limit > 0) p.limit = limit;
+            return Collection.MapReduce(map, reduce, p);
+        }
+        /// <summary>
+        /// The distinct command returns returns a list of distinct values for the given key across a collection
+        /// If an error occurs, null is returned. the exact error is not stored anywhere.
+        /// </summary>
+        /// <typeparam name="T">The type of the objects in the array</typeparam>
+        /// <param name="key">the key field to use</param>
+        /// <param name="sort">true to sort the final list</param>
+        /// <returns>The list of distinct values</returns>
+        public List<T> Distinct<T>(string key,bool sort=false)
+        {
+            var doc = new BsonDocument();
+            doc["distinct"] = Collection.Name;
+            doc["query"] = _parameters;
+            doc["key"] = key;
+            var ret = Collection.Database.RunCommand(doc, true);
+            if (ret.Ok && ret.HasResponse)
+            {
+                var outType = typeof(T);
+                return (ret.Response["values"] as object[])
+                        .Select(entry => (T)Convert.ChangeType(entry, outType))
+                        .ToList();
+            }
+            return null;
+        }
+        /// <summary>
+        /// Group returns an array of grouped items. The command is similar to SQL's group by
+        /// </summary>
+        /// <param name="key">The key parameter. If it is a string, it will be treated as a javascript function</param>
+        /// <param name="initial"></param>
+        /// <param name="reduce"></param>
+        /// <param name="finalize"></param>
+        /// <returns></returns>
+        public List<BsonDocument> Group(object key,object initial,string reduce,string finalize=null)
+        {
+            var p = new BsonDocument{IgnoreNulls = true};
+            p["group"] =new {ns = Collection.Name, cond = _parameters, initial};
+            p["group.$reduce"] = reduce.Contains("function") ? reduce : string.Format("function(doc,out){{ {0} }}",reduce);
+            if (key is string)
+            {
+                var keyStatements = (string)key;
+                p["group.$keyf"] = keyStatements.Contains("function")
+                                       ? keyStatements
+                                       : string.Format("function(doc){{ {0} }}", keyStatements);
+            }
+            else
+            {
+                p["group.key"] = key;
+            }
+            if (!string.IsNullOrEmpty(finalize)) p["group.finalize"] = finalize;
+            var ret = Collection.Database.RunCommand(p, true);
+            return ret.Ok ? (ret.Response["retval"] as object[]).OfType<BsonDocument>().ToList() : null;
+        }
+        /// <summary>
+        /// Computes the sum of multiple fields
+        /// </summary>
+        /// <param name="fields"></param>
+        /// <returns></returns>
+        public BsonDocument Sum(params string[] fields)
+        {
+            var reduceFn = string.Join(";", fields.Select(x => string.Format("out.{0}+=doc.{0}", x)).ToArray());
+            var initial = new BsonDocument();
+            foreach (var x in fields)
+            {
+                initial[x] = 0.0;
+            }
+            var key = "return {key:true}";
+            var sumImpDocs = Group(key, initial, reduceFn);
+            if (sumImpDocs != null && sumImpDocs.Count == 1)
+            {
+                return sumImpDocs[0];
+            }
+            return null;
+        }
+        /// <summary>
+        /// Computes the sum of the given field
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public T? Sum<T>(string key) where T:struct 
+        {
+            var doc = Sum(key);
+            if (doc != null) return doc.Get<T>(key);
+            return null;
         }
     }
 

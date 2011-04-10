@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using CSMongo.Bson;
 using System.IO;
 using CSMongo.Types;
@@ -33,27 +30,22 @@ namespace CSMongo.DataTypes {
         /// Handles converting the value into an appropriate type
         /// </summary>
         protected override object ConvertValue<T>(object value) {
-            Type change = typeof(T);
-            if (change.IsEnum) {
-                return Enum.Parse(change, (this.Value ?? string.Empty).ToString(), true);
-            }
-            else {
-                return base.ConvertValue<T>(value);
-            }
+            var change = typeof(T);
+            return change.IsEnum ? Enum.Parse(change, (Value ?? string.Empty).ToString(), true) : base.ConvertValue<T>(value);
         }
 
         /// <summary>
         /// Sets the current value of this MongoNumber
         /// </summary>
         public override void Set<T>(T value) {
-            this.Value = Convert.ToInt64(value);
+            Value = Convert.ToInt64(value);
         }
 
         /// <summary>
         /// Converts this value into a series of BSON bytes
         /// </summary>
         public override byte[] ToBson() {
-            return BsonTranslator.AsInt64(this.Value as long? ?? default(long));
+            return BsonTranslator.AsInt64(Value as long? ?? default(long));
         }
 
         /// <summary>

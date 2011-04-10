@@ -18,22 +18,7 @@ namespace CSMongo.Extensions.Queries {
         {
             return documents.Select(document => document.Get(template));
         }
-
-        ///// <summary>
-        ///// Selects information from the document in a specific format
-        ///// </summary>
-        //public static IEnumerable<T> AsWithId<T>(this IEnumerable<MongoDocument> documents, T template, string idField = "Id")
-        //{
-        //    return documents.Select(document => document.GetWithId(template, idField));
-        //}
-        ///// <summary>
-        ///// Selects information from the document in a specific format
-        ///// </summary>
-        //public static IEnumerable<T> As<T>(this IEnumerable<BsonDocument> documents, string start, T template)
-        //{
-        //    return documents.Select(document => document.Get(start, template));
-        //}
-
+        
         /// <summary>
         /// Selects information from the document in a specific format
         /// </summary>

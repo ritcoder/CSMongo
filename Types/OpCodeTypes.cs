@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace CSMongo.Types {
+﻿namespace CSMongo.Types {
     
-    public enum OpCodeTypes : int {
+    public enum OpCodeTypes
+    {
 
         Reply = 1,
 

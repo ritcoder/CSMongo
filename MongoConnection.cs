@@ -110,19 +110,19 @@ namespace CSMongo {
         /// Opens the connection to the database
         /// </summary>
         public void Open() {
-            if (this.Connected) { return; }
+            if (Connected) { return; }
 
             //notify any event handlers this is opening
-            if (this.BeforeConnectionOpened != null) { this.BeforeConnectionOpened(this); }
+            if (BeforeConnectionOpened != null) { BeforeConnectionOpened(this); }
 
             //and then try and open the connection
-            this._Client = new TcpClient();
-            this._Client.Connect(this.Host, this.Port);
-            this._Buffer = new BufferedStream(this._Client.GetStream());
-            this._Writer = new BinaryWriter(this._Buffer);
+            _Client = new TcpClient();
+            _Client.Connect(Host, Port);
+            _Buffer = new BufferedStream(_Client.GetStream());
+            _Writer = new BinaryWriter(_Buffer);
 
             //notify this has been connected
-            if (this.AfterConnectionOpen != null) { this.AfterConnectionOpen(this); }
+            if (AfterConnectionOpen != null) { AfterConnectionOpen(this); }
 
         }
 
@@ -149,7 +149,7 @@ namespace CSMongo {
         public ResponseBase SendRequest(RequestBase request) {
 
             //manage the connection state automatically if needed
-            if (this.AutoConnect) { this.Open(); }
+            if (AutoConnect) { Open(); }
 
             //attempt to perform the request
             try {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CSMongo.Bson;
+﻿using CSMongo.Bson;
 using System.IO;
 using CSMongo.Types;
 
@@ -24,14 +20,14 @@ namespace CSMongo.DataTypes {
         /// Returns if the type requested can be assigned to this type
         /// </summary>
         public override bool IsAllowedValue<T>(T value) {
-            return value is string ? true : false;
+            return value is string;
         }
 
         /// <summary>
         /// Handles converting the value to a BSON format
         /// </summary>
         public override byte[] ToBson() {
-            return BsonTranslator.AsCString(this.Value as string ?? string.Empty);
+            return BsonTranslator.AsCString(Value as string ?? string.Empty);
         }
 
         /// <summary>

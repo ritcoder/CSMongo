@@ -64,7 +64,7 @@ namespace CSMongo {
             set { _DefaultGetMoreReturnCount = Math.Max(value, DEFAULT_RETURN_COUNT); }
         }
         private static int _DefaultGetMoreReturnCount = DEFAULT_RETURN_COUNT;
-        private const int DEFAULT_RETURN_COUNT = 100;
+        private const int DEFAULT_RETURN_COUNT = 1000;
     
     }
 

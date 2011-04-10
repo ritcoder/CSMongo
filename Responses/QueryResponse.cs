@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using CSMongo.Requests;
 using System.IO;
 using CSMongo.Bson;
 using CSMongo.Exceptions;
@@ -56,7 +53,7 @@ namespace CSMongo.Responses {
         /// Returns if there are documents to use after a response
         /// </summary>
         public bool HasDocuments {
-            get { return this.Documents is List<MongoDocument> && this.Documents.Count > 0; }
+            get { return Documents != null && Documents.Count > 0; }
         }
 
         #endregion
@@ -67,7 +64,7 @@ namespace CSMongo.Responses {
         /// Handles reading back the content for this query
         /// </summary>
         protected override void ParseStream(Stream stream) {
-            BinaryReader reader = new BinaryReader(stream);
+            var reader = new BinaryReader(stream);
 
             /* Message Format (Excluding Header)
              * Flag (int32) - normally zero, non-zero on query failure
@@ -78,30 +75,36 @@ namespace CSMongo.Responses {
              */
 
             //get the flag first
-            this.Flag = reader.ReadInt32();
+            Flag = reader.ReadInt32();
 
             //second is the cursor value
-            this.CursorId = reader.ReadInt64();
+            CursorId = reader.ReadInt64();
 
             //and the skipped and returned counts
-            this.StartingFrom = reader.ReadInt32();
-            this.TotalReturned = reader.ReadInt32();
+            StartingFrom = reader.ReadInt32();
+            TotalReturned = reader.ReadInt32();
 
             //next, read and parse the records
-            this.Documents = new List<MongoDocument>();
-            for (int i = 0; i < this.TotalReturned; i++) {
+            Documents = new List<MongoDocument>();
+            for (var i = 0; i < TotalReturned; i++) {
 
                 //convert to a MongoDocument
-                BsonDocument parsed = BsonDocument.FromStream(stream);
-                MongoDocument document = new MongoDocument();
+                var parsed = BsonDocument.FromStream(stream);
+                var document = new MongoDocument();
                 document.Merge(parsed);
+                //when the parsed doc has a field _id which is not MongOid, it ends up being replaced
+                //as a fix, rename it as id
+                if (parsed.Has(Mongo.DocumentIdKey) && parsed[Mongo.DocumentIdKey].GetType() != typeof(MongoOid))
+                {
+                    document["id"] = parsed[Mongo.DocumentIdKey];
+                }
 
                 //and add it to the list
-                this.Documents.Add(document);
+                Documents.Add(document);
             }
 
             //check for server exceptions
-            this.CheckForExceptions();
+            CheckForExceptions();
 
         }
 
@@ -113,9 +116,9 @@ namespace CSMongo.Responses {
         /// Checks for a default response if there is an error
         /// </summary>
         public void CheckForExceptions() {
-            BsonObject result = this.GetDefaultResponse();
+            var result = GetDefaultResponse();
             if (result.Has("errmsg")) {
-                throw new MongoServerException(result.Get<string>("errmsg", "Unknown database error!"));
+                throw new MongoServerException(result.Get("errmsg", "Unknown database error!"));
             }
         }
 
@@ -123,7 +126,7 @@ namespace CSMongo.Responses {
         /// Finds a response or returns an empty object
         /// </summary>
         public BsonObject GetDefaultResponse() {
-            return this.HasDocuments ? this.Documents.First() : new MongoDocument();
+            return HasDocuments ? Documents.First() : new MongoDocument();
         }
 
         #endregion

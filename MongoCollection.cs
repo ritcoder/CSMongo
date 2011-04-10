@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Configuration;
 using CSMongo.Requests;
-using CSMongo.Responses;
 using CSMongo.Commands;
 using CSMongo.Results;
 using CSMongo.Query;
@@ -27,13 +24,13 @@ namespace CSMongo {
         /// the same collection
         /// </summary>
         public MongoCollection(MongoDatabase database, string collection) {
-            this.Database = database;
-            this.Name = collection;
+            Database = database;
+            Name = collection;
 
             //set the containers for updating
-            this._Inserts = new List<MongoDocument>();
-            this._Deletes = new List<MongoDocument>();
-            this._Updates = new List<KeyValuePair<string, MongoDocument>>();
+            _Inserts = new List<MongoDocument>();
+            _Deletes = new List<MongoDocument>();
+            _Updates = new List<KeyValuePair<string, MongoDocument>>();
             _Upserts = new List<KeyValuePair<string, MongoDocument>>();
         }
 
@@ -55,7 +52,7 @@ namespace CSMongo {
         /// Returns the connection used for this request
         /// </summary>
         public MongoConnection Connection {
-            get { return this.Database.Connection; }
+            get { return Database.Connection; }
         }
 
         //update information
@@ -167,28 +164,28 @@ namespace CSMongo {
         /// Adds a record to be inserted when changes are submitted
         /// </summary>
         public void InsertOnSubmit(MongoDocument document) {
-            this._Inserts.Add(document);
+            _Inserts.Add(document);
         }
 
         /// <summary>
         /// Adds a set of records to be inserted when changes are submitted
         /// </summary>
         public void InsertOnSubmit(IEnumerable<MongoDocument> documents) {
-            this._Inserts.AddRange(documents);
+            _Inserts.AddRange(documents);
         }
 
         /// <summary>
         /// Adds a record to be deleted when changes are submitted
         /// </summary>
         public void DeleteOnSubmit(MongoDocument document) {
-            this._Deletes.Add(document);
+            _Deletes.Add(document);
         }
 
         /// <summary>
         /// Adds a set of records to be deleted when changes are submitted
         /// </summary>
         public void DeleteOnSubmit(IEnumerable<MongoDocument> documents) {
-            this._Deletes.AddRange(documents);
+            _Deletes.AddRange(documents);
         }
 
         /// <summary>
@@ -232,8 +229,10 @@ namespace CSMongo {
                 {
                     key[(string)upsertKey] = doc[(string)upsertKey];
                 }
-                else
+                else if (upsertKey is BsonDocument)
                     key.Merge((BsonDocument)upsertKey);
+                else //an object so wrap it up
+                    key.Merge(new BsonDocument(upsertKey));
                 doc[Mongo.UpsertKey] = key;
                 var hash = key.GetObjectHash();
                 if (_Upserts.Any(item => item.Key.Equals(hash))) { return;}
@@ -277,30 +276,23 @@ namespace CSMongo {
                 //if this hasn't changed then skip it
                 if (item.Key.Equals(item.Value.GetObjectHash())) { continue; }
 
-                /*//create a bson document of the update to create
+                var request = new UpdateRequest(this);
+                //set the updates
                 var update = new BsonDocument();
                 update.Merge(item.Value);
                 update.Remove(Mongo.DocumentIdKey);
-
-                //start with the update
-                this.Find().FindById(item.Value.Id).Set(update);
-
+                request.Modifications["$set"] = update;
                 //check for anything removed
-                var removed = item.Value.GetRemovedFields();
-                if (removed.Count() > 0) {
-                    Find().FindById(item.Value.Id).Unset(removed.ToArray());
-                }*/
-
-                //Might want to try and merge this into the same
-                //request to avoid two trips to the database -- But
-                //this might cause an issue with older versions of
-                //the same database since an unset call would cause
-                //the inital set request to fail...
-
-                var request = new UpdateRequest(this);
-                request.Modifications["$set"] = item.Value;
-                request.Modifications["$unset"] = item.Value.GetRemovedFields();
-                request.Parameters["$in"] = new[] { item.Value.Id };
+                var removeDoc = new BsonDocument();
+                foreach (var field in item.Value.GetRemovedFields())
+                {
+                    removeDoc[field] = 1;
+                }
+                if (removeDoc.FieldCount > 0)
+                {
+                    request.Modifications["$unset"] = removeDoc;
+                }
+                request.Parameters += MongoQuery.CreateQueryInstance().FindById(item.Value.Id).QueryDocument; 
                 Database.SendRequest(request);
 
             }
@@ -375,6 +367,24 @@ namespace CSMongo {
         #endregion
 
         #region Commands
+        /// <summary>
+        /// Runs M/R on the given collection
+        /// </summary>
+        /// <param name="map">the map statements/ funcation</param>
+        /// <param name="reduce">the reduce statements or functions</param>
+        /// <param name="p">the parameters</param>
+        /// <returns></returns>
+        public List<BsonDocument> MapReduce(string map,string reduce,MapReduceParameters p)
+        {
+            if (p == null) p = new MapReduceParameters{keyFieldName = "key"};
+            if (!string.IsNullOrEmpty(map)) p.map = map;
+            if (!string.IsNullOrEmpty(reduce)) p.reduce = reduce;
+            if (string.IsNullOrEmpty(p.mapreduce)) p.mapreduce = Name;
+            if (p.@out == null) p.@out = new MapReduceParameters.MapReduceResultDocument { replace = Name + DateTime.Now.Ticks };
+            var docs = p.Run(Database);
+            if (p.callOk) return docs;
+            return null;
+        }
         /// <summary>
         /// Gets the next id. This is used for auto incrementing values.
         /// This was inspired by the post @ http://shiflett.org/blog/2010/jul/auto-increment-with-mongodb

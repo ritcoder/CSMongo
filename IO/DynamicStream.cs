@@ -22,16 +22,16 @@ namespace CSMongo.IO {
         /// Creates a stream with the provided length with all 0 bytes
         /// </summary>
         public DynamicStream(int length)
-            : this(length, (byte)0) {
+            : this(length, 0) {
         }
 
         /// <summary>
         /// Creates a stream with the provided length defaulting to the byte specified
         /// </summary>
         public DynamicStream(int length, byte @default) {
-            this._Output = new List<byte>();
-            for (int i = 0; i < length; i++) {
-                this._Output.Add(@default);
+            _Output = new List<byte>();
+            for (var i = 0; i < length; i++) {
+                _Output.Add(@default);
             }
         }
 

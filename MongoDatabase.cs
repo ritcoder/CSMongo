@@ -379,30 +379,28 @@ namespace CSMongo {
         public ResponseBase SendRequest(RequestBase request) {
 
             //check if this person needs to authenticate
-            if (this.HasCredentials && !this.HasAuthenticated && !this._IsAttemptingAuthentication) {
-                this._IsAttemptingAuthentication = true;
-                this.Authenticate();
+            if (HasCredentials && !HasAuthenticated && !_IsAttemptingAuthentication) {
+                _IsAttemptingAuthentication = true;
+                Authenticate();
             }
 
             //send the command to the server
-            return this.Connection.SendRequest(request);
+            return Connection.SendRequest(request);
         }
 
         /// <summary>
         /// Handles disconnecting from the database
         /// </summary>
         public void Disconnect() {
-            if (!this.Connection.Connected) { return; }
+            if (!Connection.Connected) { return; }
 
             //kill off the cursors first
-            this.KillCursors();
+            KillCursors();
 
             //check if the logout command should be sent
-            if (this.Connection.Connected && this.HasAuthenticated) {
-                MongoDatabaseCommands.LogOut(this);
-                this.HasAuthenticated = false;
-            }
-
+            if (!Connection.Connected || !HasAuthenticated) return;
+            MongoDatabaseCommands.LogOut(this);
+            HasAuthenticated = false;
         }
 
         #endregion
@@ -413,7 +411,7 @@ namespace CSMongo {
         /// Submits changes for all collections that have items queued
         /// </summary>
         public void SubmitChanges() {
-            foreach (MongoCollection collection in this._Collections.Values) {
+            foreach (var collection in _Collections.Values) {
                 collection.SubmitChanges();
             }
         }

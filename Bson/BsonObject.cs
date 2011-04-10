@@ -58,12 +58,12 @@ namespace CSMongo.Bson {
         /// Returns the total number of fields inside of this object
         /// </summary>
         public int FieldCount {
-            get { return this._Fields.Count; }
+            get { return _Fields.Count; }
         }
 
         //the fields that are included in this object
         private BsonMongoDictionary _Fields;
-        private List<string> _Removed;
+        private readonly List<string> _Removed;
 
         #endregion
 
@@ -82,8 +82,8 @@ namespace CSMongo.Bson {
         /// Assigns or gets the value of a field on this object
         /// </summary>
         public object this[string field] {
-            get { return this.Get(field); }
-            set { this.Set(field, value); }
+            get { return Get(field); }
+            set { Set(field, value); }
         }
 
         /// <summary>
@@ -105,14 +105,14 @@ namespace CSMongo.Bson {
         /// Handles getting the value from this DynamicCObject
         /// </summary>
         public object Get(string field) {
-            return this.Get<object>(field, null);
+            return Get<object>(field, null);
         }
 
         /// <summary>
         /// Handles getting the value from this DynamicCObject
         /// </summary>
         public T Get<T>(string field) {
-            return this.Get(field, default(T));
+            return Get(field, default(T));
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace CSMongo.Bson {
 
             //locate the field first
             field = this._FormatField(field);
-            MongoFieldReference detail = this._FindField(field, false);
+            MongoFieldReference detail = _FindField(field, false);
 
             //if nothing is found then just return the value
             try {
@@ -148,7 +148,10 @@ namespace CSMongo.Bson {
                 }
                 if (detail.Field is MongoNumberType)
                 {
-                    var v = detail.Field.Get(@default.GetType()); //todo: what happens if @default is null
+                    //if no type, return a double
+                    if (typeof(T) == typeof(Object)) return (T)detail.Field.Get(typeof(double));
+                   // if (@default == null) @default = 0.0;
+                    var v = detail.Field.Get(null == @default ? typeof(double) : @default.GetType()); //todo: what happens if @default is null
                     return v == null ? @default : (T) v;
                 }
                 return (T) detail.Field.Get<T>();
@@ -163,7 +166,7 @@ namespace CSMongo.Bson {
         /// Handles assigning an object to the DynamicObject
         /// </summary>
         public void Set(string field, object value) {
-            this.Set<object>(field, value);
+            Set<object>(field, value);
         }
 
         /// <summary>
@@ -172,8 +175,8 @@ namespace CSMongo.Bson {
         public void Set<T>(string field, T value) {
 
             //locate the field first
-            field = this._FormatField(field);
-            MongoFieldReference type = this._FindField(field, true);
+            field = _FormatField(field);
+            MongoFieldReference type = _FindField(field, true);
 
             //check the field value was found
             if (type == null || type.Field == null) {
@@ -207,22 +210,22 @@ namespace CSMongo.Bson {
         /// Returns if a field has a value of the specified type
         /// </summary>
         public bool Has<T>(string field) {
-            return this.Get<T>(field) is T;
+            return Get<T>(field) is T; //todo: check this entry for non existing values
         }
 
         /// <summary>
         /// Serializes an object into a byte array
         /// </summary>
         public void Serialize<T>(string field, T value) where T : class {
-            this.Serialize<T>(field, value, BsonObject._BinarySerialize);
+            Serialize(field, value, _BinarySerialize);
         }
 
         /// <summary>
         /// Serializes an object into a byte array
         /// </summary>
         public void Serialize<T>(string field, T value, Func<T, byte[]> serialize) where T : class {
-            byte[] bytes = serialize(value);
-            this.Set<byte[]>(field, bytes);
+            var bytes = serialize(value);
+            Set(field, bytes);
         }
 
         /// <summary>
@@ -599,13 +602,13 @@ namespace CSMongo.Bson {
         public virtual byte[] ToBsonByteArray() {
 
             //get a container to hold the bytes while we export
-            List<BsonFieldDetail> values = new List<BsonFieldDetail>();
+            var values = new List<BsonFieldDetail>();
 
             //generate all of the bytes required
-            foreach (KeyValuePair<string, MongoDataType> item in this._Fields) {
+            foreach (var item in _Fields) {
                 //render the bytes for this request
-                using (MemoryStream output = new MemoryStream()) {
-                    using (BinaryWriter writer = new BinaryWriter(output)) {
+                using (var output = new MemoryStream()) {
+                    using (var writer = new BinaryWriter(output)) {
 
                         //write the type, key and BSON value
                         writer.Write(BsonTranslator.AsByte((byte)item.Value.GetDataType()));
@@ -629,8 +632,8 @@ namespace CSMongo.Bson {
             values = this.OnBeforeFinishBsonRender(values).ToList();
 
             //merge the final list
-            List<byte> bytes = new List<byte>();
-            foreach (byte[] set in values.Select(item => item.Bytes)) {
+            var bytes = new List<byte>();
+            foreach (var set in values.Select(item => item.Bytes)) {
                 bytes.AddRange(set);
             }
 

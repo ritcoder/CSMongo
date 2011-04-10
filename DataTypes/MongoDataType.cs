@@ -28,11 +28,12 @@ namespace CSMongo.DataTypes {
             new MongoNumberType(),
             new MongoBinaryType(),
             new MongoArrayType(),
+            new MongoRegexType(),
             new MongoDocumentType()
         };
 
         //a list of custom mongo types that are evaluated before built in ones
-        private static List<MongoDataType> _Custom = new List<MongoDataType>();
+        private static readonly List<MongoDataType> Custom = new List<MongoDataType>();
 
         #endregion
 
@@ -124,7 +125,7 @@ namespace CSMongo.DataTypes {
         public static MongoDataType FindTypeFor(object value)
         {
             //check each type for a valid handler
-            foreach (var type in _Custom.Union(BuiltIn).Where(type => type.IsAllowedValue(value)))
+            foreach (var type in Custom.Union(BuiltIn).Where(type => type.IsAllowedValue(value)))
             {
                 return Activator.CreateInstance(type.GetType()) as MongoDataType;
             }
@@ -144,21 +145,21 @@ namespace CSMongo.DataTypes {
             }
 
             //add the instance
-            _Custom.Add(Activator.CreateInstance<T>());
+            Custom.Add(Activator.CreateInstance<T>());
         }
 
         /// <summary>
         /// Unregisters a type from the MongoData
         /// </summary>
         public static void UnregisterMongoDataType<T>() where T : MongoDataType {
-            _Custom.RemoveAll(item => item is T);
+            Custom.RemoveAll(item => item is T);
         }
 
         /// <summary>
         /// Returns if any of the current registered types matches the incoming type
         /// </summary>
         private static bool IsTypeRegistered<T>() {
-            return _Custom.Union(BuiltIn).Any(item => item is T);
+            return Custom.Union(BuiltIn).Any(item => item is T);
         }
 
         #endregion

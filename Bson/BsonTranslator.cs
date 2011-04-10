@@ -7,7 +7,6 @@ using CSMongo.IO;
 using CSMongo.Types;
 using System.Text.RegularExpressions;
 using CSMongo.Extensions;
-using CSMongo.DataTypes;
 
 namespace CSMongo.Bson {
     
@@ -24,15 +23,15 @@ namespace CSMongo.Bson {
         public static Dictionary<string, object> FromStream(Stream stream) {
 
             //start reading out the values
-            Dictionary<string, object> values = new Dictionary<string, object>();
+            var values = new Dictionary<string, object>();
             while (stream.Position < stream.Length) {
 
                 //get the type to use
-                MongoDataTypes type = (MongoDataTypes)stream.ReadByte();
+                var type = (MongoDataTypes)stream.ReadByte();
 
                 //get the information for this value
-                string field = BsonTranslator.ReadString(stream);
-                object value = BsonTranslator._ParseValueFromStream(type, stream);
+                var field = ReadString(stream);
+                var value = ParseValueFromStream(type, stream);
 
                 //remove just in case and add the item
                 if (string.IsNullOrEmpty(field)) { continue; }
@@ -51,32 +50,32 @@ namespace CSMongo.Bson {
         }
          
         //uses a type to determine how to read a value
-        private static object _ParseValueFromStream(MongoDataTypes type, Stream stream) {
+        private static object ParseValueFromStream(MongoDataTypes type, Stream stream) {
 
             //check the types provided
             switch (type) {
                 case MongoDataTypes.Oid:
-                    return BsonTranslator.ReadOid(stream);
+                    return ReadOid(stream);
                 case MongoDataTypes.String:
-                    return BsonTranslator.ReadCString(stream);
+                    return ReadCString(stream);
                 case MongoDataTypes.Int32:
-                    return BsonTranslator.ReadInt32(stream);
+                    return ReadInt32(stream);
                 case MongoDataTypes.Int64:
-                    return BsonTranslator.ReadInt64(stream);
+                    return ReadInt64(stream);
                 case MongoDataTypes.Date:
-                    return BsonTranslator.ReadDate(stream);
+                    return ReadDate(stream);
                 case MongoDataTypes.Number:
-                    return BsonTranslator.ReadNumber(stream);
+                    return ReadNumber(stream);
                 case MongoDataTypes.Boolean:
-                    return BsonTranslator.ReadBoolean(stream);
+                    return ReadBoolean(stream);
                 case MongoDataTypes.Binary:
-                    return BsonTranslator.ReadBinary(stream);
+                    return ReadBinary(stream);
                 case MongoDataTypes.Array:
-                    return BsonTranslator.ReadArray(stream);
+                    return ReadArray(stream);
                 case MongoDataTypes.Regex:
-                    return BsonTranslator.ReadRegularExpression(stream);
+                    return ReadRegularExpression(stream);
                 case MongoDataTypes.Object:
-                    return BsonTranslator.ReadObject(stream);
+                    return ReadObject(stream);
                 default:
                     return null;
             }
@@ -91,14 +90,14 @@ namespace CSMongo.Bson {
         /// Creates the bytes for an integer in BSON format
         /// </summary>
         public static byte[] AsByte(byte value) {
-            return new byte[] { value };
+            return new[] { value };
         }
 
         /// <summary>
         /// Writes a binary object to the Mongo database
         /// </summary>
         public static byte[] AsBinary(byte[] value) {
-            DynamicStream stream = new DynamicStream(4);
+            var stream = new DynamicStream(4);
 
             //write the kinds of stream this is
             //for now default to User-Defined
@@ -152,8 +151,8 @@ namespace CSMongo.Bson {
         /// Writes a the bytes for a CS string in BSON format
         /// </summary>
         public static byte[] AsCString(string value) {
-            DynamicStream stream = new DynamicStream();
-            stream.Append(BsonTranslator.AsString(value));
+            var stream = new DynamicStream();
+            stream.Append(AsString(value));
             stream.InsertAt(0, BitConverter.GetBytes(stream.Length));
             return stream.ToArray();
         }
@@ -162,9 +161,9 @@ namespace CSMongo.Bson {
         /// Creates the bytes for a regular string in BSON format
         /// </summary>
         public static byte[] AsString(string value) {
-            DynamicStream stream = new DynamicStream();
+            var stream = new DynamicStream();
             stream.Append(Encoding.UTF8.GetBytes(value));
-            stream.Append((byte)0);
+            stream.Append(0);
             return stream.ToArray();
         }
 
@@ -190,8 +189,8 @@ namespace CSMongo.Bson {
 
             //simply create a Document with each index as
             //the value of the index of the item
-            BsonDocument result = new BsonDocument();
-            for(int i = 0; i < array.Count(); i++) {
+            var result = new BsonDocument();
+            for(var i = 0; i < array.Count(); i++) {
                 result.Set(i.ToString(), array.ElementAt(i));
             }
 
@@ -205,14 +204,33 @@ namespace CSMongo.Bson {
         public static byte[] AsDate(DateTime value) {
             
             //get the tick count
-            TimeSpan difference = value.ToUniversalTime() - Mongo.Epoch;
-            long span = Convert.ToInt64(Math.Floor(difference.TotalMilliseconds));
+            var difference = value.ToUniversalTime() - Mongo.Epoch;
+            var span = Convert.ToInt64(Math.Floor(difference.TotalMilliseconds));
 
             //and write as an int
-            return BsonTranslator.AsInt64(span);
+            return AsInt64(span);
 
         }
 
+        /// <summary>
+        /// Writes a regex in BSON format
+        /// </summary>
+        /// <param name="value">The regex instance</param>
+        /// <returns>regex as bson byte arrray</returns>
+        public static byte[] AsRegex(Regex value)
+        {
+            var optionsStr = "";
+            var flags = value.Options;
+            if ((flags & RegexOptions.IgnoreCase) == RegexOptions.IgnoreCase) optionsStr += "i";
+            if ((flags & RegexOptions.CultureInvariant) == RegexOptions.CultureInvariant) optionsStr += "l";
+            if ((flags & RegexOptions.Multiline) == RegexOptions.Multiline) optionsStr += "m";
+            if ((flags & RegexOptions.Singleline) == RegexOptions.Singleline) optionsStr += "s";
+            if ((flags & RegexOptions.IgnorePatternWhitespace) == RegexOptions.IgnorePatternWhitespace) optionsStr += "x";
+            var stream = new DynamicStream();
+            stream.Append(AsString(value.ToString()));
+            stream.Append(AsString(optionsStr));
+            return stream.ToArray();
+        }
         #endregion
 
         #region From BSON Format
@@ -221,11 +239,11 @@ namespace CSMongo.Bson {
         /// Reads a regular expression from the stream
         /// </summary>
         public static Regex ReadRegularExpression(Stream stream) {
-            string expression = BsonTranslator.ReadString(stream);
-            string options = BsonTranslator.ReadString(stream);
+            var expression = ReadString(stream);
+            var options = ReadString(stream);
 
             //create the new Regex options value
-            RegexOptions flag = RegexOptions.None;
+            var flag = RegexOptions.None;
             if (options.Contains("i")) { flag = flag.Include(RegexOptions.IgnoreCase); }
             if (options.Contains("l")) { flag = flag.Include(RegexOptions.CultureInvariant); }
             if (options.Contains("m")) { flag = flag.Include(RegexOptions.Multiline); }
@@ -240,10 +258,10 @@ namespace CSMongo.Bson {
         /// Reads a binary object from the stream
         /// </summary>
         public static byte[] ReadBinary(Stream stream) {
-            BinaryReader reader = new BinaryReader(stream);
+            var reader = new BinaryReader(stream);
 
             //get the length and flag
-            int length = reader.ReadInt32();
+            var length = reader.ReadInt32();
             
             //read the type identifier (we don't need to use it)
             //MongoBinaryTypes type = (MongoBinaryTypes)reader.ReadByte();
@@ -265,7 +283,7 @@ namespace CSMongo.Bson {
         /// Reads a boolean value from the stream
         /// </summary>
         public static bool ReadBoolean(Stream stream) {
-            BinaryReader reader = new BinaryReader(stream);
+            var reader = new BinaryReader(stream);
             return reader.ReadBoolean();
         }
 
@@ -273,7 +291,7 @@ namespace CSMongo.Bson {
         /// Reads a number value from the stream
         /// </summary>
         public static double ReadNumber(Stream stream) {
-            BinaryReader reader = new BinaryReader(stream);
+            var reader = new BinaryReader(stream);
             return reader.ReadDouble();
         }
 
@@ -281,7 +299,7 @@ namespace CSMongo.Bson {
         /// Reads an int32 value from the stream
         /// </summary>
         public static int ReadInt32(Stream stream) {
-            BinaryReader reader = new BinaryReader(stream);
+            var reader = new BinaryReader(stream);
             return reader.ReadInt32();
         }
 
@@ -289,7 +307,7 @@ namespace CSMongo.Bson {
         /// Handles reading int64 value from the stream
         /// </summary>
         public static object ReadInt64(Stream stream) {
-            BinaryReader reader = new BinaryReader(stream);
+            var reader = new BinaryReader(stream);
             return reader.ReadInt64();
         }
 
@@ -297,8 +315,8 @@ namespace CSMongo.Bson {
         /// Reads an Oid value from a BSON object
         /// </summary>
         public static MongoOid ReadOid(Stream stream) {
-            BinaryReader reader = new BinaryReader(stream);
-            byte[] bytes = reader.ReadBytes(12);
+            var reader = new BinaryReader(stream);
+            var bytes = reader.ReadBytes(12);
             return new MongoOid(bytes);
         }
 
@@ -306,12 +324,12 @@ namespace CSMongo.Bson {
         /// Reads a string value from a BSON object (zero terminated)
         /// </summary>
         public static string ReadString(Stream stream) {
-            BinaryReader reader = new BinaryReader(stream);
+            var reader = new BinaryReader(stream);
 
             //gather all of the bytes to use
-            List<byte> bytes = new List<byte>();
+            var bytes = new List<byte>();
             while (true) {
-                byte character = reader.ReadByte();
+                var character = reader.ReadByte();
 
                 //if the zero byte, give up
                 if (character <= 0) { break; }
@@ -327,7 +345,7 @@ namespace CSMongo.Bson {
         /// Reads a cstring value using the length provided as the object value
         /// </summary>
         public static string ReadCString(Stream stream) {
-            BinaryReader reader = new BinaryReader(stream);
+            var reader = new BinaryReader(stream);
 
             //get the 'length' value - Since we are currently
             //reading CStrings like normal strings we don't
@@ -337,7 +355,7 @@ namespace CSMongo.Bson {
 
             //just use the typical string reading for now. 
             //not sure if this needs to be something special
-            return BsonTranslator.ReadString(stream);
+            return ReadString(stream);
 
         }
 

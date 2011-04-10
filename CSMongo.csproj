@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bson\BsonAnonymousTypeParser.cs" />
+    <Compile Include="DataTypes\MongoRegexType.cs" />
     <Compile Include="Exceptions\ConnectionNotOpenedException.cs" />
     <Compile Include="Exceptions\InvalidMongoConnectionStringException.cs" />
     <Compile Include="Exceptions\MissingCollectionNameException.cs" />
@@ -134,6 +135,7 @@
     <Compile Include="Responses\ResponseBase.cs" />
     <Compile Include="Results\ProfileResult.cs" />
     <Compile Include="Types\FindAndModifyParameters.cs" />
+    <Compile Include="Types\MapReduceParameters.cs" />
     <Compile Include="Types\MongoBinaryTypes.cs" />
     <Compile Include="Types\MongoDataTypes.cs" />
     <Compile Include="Types\OpCodeTypes.cs" />
