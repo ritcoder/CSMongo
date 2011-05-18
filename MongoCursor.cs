@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CSMongo.Requests;
+﻿using CSMongo.Requests;
 
 namespace CSMongo {
     
@@ -17,9 +13,9 @@ namespace CSMongo {
         /// Creates a new MongoCursor
         /// </summary>
         public MongoCursor(QueryRequest query, long cursor, int count) {
-            this.Cursor = cursor;
-            this.Query = query;
-            this.ReturnCount = count;
+            Cursor = cursor;
+            Query = query;
+            ReturnCount = count;
         }
 
         #endregion
@@ -46,7 +42,7 @@ namespace CSMongo {
         /// Make certain there is a real cursor to use
         /// </summary>
         public bool HasCursor {
-            get { return this.Cursor > 0; }
+            get { return Cursor > 0; }
         }
 
         #endregion

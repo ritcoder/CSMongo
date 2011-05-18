@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using CSMongo.Exceptions;
 
@@ -18,8 +16,8 @@ namespace CSMongo {
         /// Creates a new empty connection string reader
         /// </summary>
         public MongoConnectionString() {
-            this.Port = Mongo.DefaultPort;
-            this.AutoConnect = true;
+            Port = Mongo.DefaultPort;
+            AutoConnect = true;
         }
 
         #endregion
@@ -64,7 +62,7 @@ namespace CSMongo {
         /// Parses a string for Mongo connection data
         /// </summary>
         public static MongoConnectionString Parse(string connectionString) {
-            MongoConnectionString reader = new MongoConnectionString();
+            var reader = new MongoConnectionString();
             reader.ParseString(connectionString);
             return reader;
         }
@@ -78,8 +76,8 @@ namespace CSMongo {
         /// </summary>
         public void ParseString(string connectionString) {
             try {
-                foreach (string pair in this._ExtractPairs(connectionString)) {
-                    this._AssignValue(pair);
+                foreach (var pair in _ExtractPairs(connectionString)) {
+                    _AssignValue(pair);
                 }
             }
             catch {
@@ -95,49 +93,49 @@ namespace CSMongo {
         private void _AssignValue(string item) {
 
             //extract the values
-            Match pair = Regex.Match(item ?? string.Empty, "^(?<key>[^=]+)=(?<value>.*)$");
+            var pair = Regex.Match(item ?? string.Empty, "^(?<key>[^=]+)=(?<value>.*)$");
             if (!pair.Success) { return; }
 
             //otherwise, get the values
-            string key = pair.Groups["key"].Value.Trim();
+            var key = pair.Groups["key"].Value.Trim();
             if (string.IsNullOrEmpty(key)) { return; }
 
             //get the value and undo escaping the ; values
-            string value = pair.Groups["value"].Value.Replace(@"\;", ";");
+            var value = pair.Groups["value"].Value.Replace(@"\;", ";");
 
             //depending on the value, set the property
             if (key.Equals("username", StringComparison.OrdinalIgnoreCase)) {
-                this.Username = value.Trim();
+                Username = value.Trim();
             }
             else if (key.Equals("password", StringComparison.OrdinalIgnoreCase)) {
-                this.Password = value;
+                Password = value;
             }
             else if (key.Equals("database", StringComparison.OrdinalIgnoreCase)) {
-                this.Database = value.Trim();
+                Database = value.Trim();
             }
             else if (key.Equals("host", StringComparison.OrdinalIgnoreCase)) {
-                this.Host = value.Trim();
+                Host = value.Trim();
             }
             else if (key.Equals("autoconnect")) {
-                bool auto = true;
+                bool auto;
                 bool.TryParse(value, out auto);
-                this.AutoConnect = auto;
+                AutoConnect = auto;
             }
             else if (key.Equals("port")) {
-                int port = 0;
+                int port;
                 int.TryParse(value, out port);
-                this.Port = port;
+                Port = port;
             }
 
         }
 
         //extracts all of the pairs of values (but doesn't format them)
-        private IEnumerable<string> _ExtractPairs(string connectionString) {
+        private static IEnumerable<string> _ExtractPairs(string connectionString) {
 
             //start looping each value in the string
-            bool escape = false;
-            string set = string.Empty;
-            foreach (char letter in connectionString) {
+            var escape = false;
+            var set = string.Empty;
+            foreach (var letter in connectionString) {
 
                 //check if this is the end of ths string
                 if (letter.Equals(';') && !escape) {
@@ -147,7 +145,7 @@ namespace CSMongo {
 
                     //reset the values and continue parsing
                     set = string.Empty;
-                    escape = false;
+                    escape = false; //todo: dest is same
                     continue;
                 }
 

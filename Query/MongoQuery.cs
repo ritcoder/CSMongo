@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using CSMongo.Requests;
 using CSMongo.Types;
 using CSMongo.Responses;
@@ -155,7 +154,7 @@ namespace CSMongo.Query {
         /// </summary>
         /// <param name="doc"></param>
         /// <returns></returns>
-        public MongoQuery EqualTo(MongoDocument doc)
+        public MongoQuery EqualTo(BsonDocument doc)
         {
             foreach (var name in doc.GetFieldNames())
             {
@@ -171,21 +170,21 @@ namespace CSMongo.Query {
         /// <returns></returns>
         public MongoQuery EqualTo(object o)
         {
-            return o == null ? this : EqualTo(new MongoDocument(o));
+            return o == null ? this : EqualTo(new BsonDocument(o));
         }
 
         /// <summary>
         /// Finds a record based on the Oid value
         /// </summary>
         public MongoQuery FindById(string id) {
-            return this.FindById(new MongoOid(id));
+            return FindById(new MongoOid(id));
         }
 
         /// <summary>
         /// Finds a record based on the Oid value
         /// </summary>
         public MongoQuery FindById(byte[] id) {
-            return this.FindById(new MongoOid(id));
+            return FindById(new MongoOid(id));
         }
 
         /// <summary>
@@ -196,7 +195,7 @@ namespace CSMongo.Query {
             //use 'in' to find the id - There is an
             //actual option to use for this which
             //will be converted to later on
-            return this.In(Mongo.DocumentIdKey, new MongoOid[] { id });
+            return In(Mongo.DocumentIdKey, new[] { id });
 
         }
 
@@ -204,112 +203,112 @@ namespace CSMongo.Query {
         /// Finds all records that are not equal to the value provided
         /// </summary>
         public MongoQuery NotEqualTo(string field, object value) {
-            return this.AppendParameter(field, "$ne", value);
+            return AppendParameter(field, "$ne", value);
         }
 
         /// <summary>
         /// Finds all records greater than or equal to the provided value
         /// </summary>
         public MongoQuery GreaterOrEqual(string field, object value) {
-            return this.AppendParameter(field, "$gte", value);
+            return AppendParameter(field, "$gte", value);
         }
 
         /// <summary>
         /// Finds all records greater than the provided value
         /// </summary>
         public MongoQuery Greater(string field, object value) {
-            return this.AppendParameter(field, "$gt", value);
+            return AppendParameter(field, "$gt", value);
         }
 
         /// <summary>
         /// Finds all records less than or equal to the provided value
         /// </summary>
         public MongoQuery LessOrEqual(string field, object value) {
-            return this.AppendParameter(field, "$lte", value);
+            return AppendParameter(field, "$lte", value);
         }
 
         /// <summary>
         /// Finds all records less than the provided value
         /// </summary>
         public MongoQuery Less(string field, object value) {
-            return this.AppendParameter(field, "$lt", value);
+            return AppendParameter(field, "$lt", value);
         }
 
         /// <summary>
         /// Finds records that the requested field exists in
         /// </summary>
         public MongoQuery Exists(string field) {
-            return this.AppendParameter(field, "$exists", true);
+            return AppendParameter(field, "$exists", true);
         }
 
         /// <summary>
         /// Finds records that the requested field does not exist in
         /// </summary>
         public MongoQuery NotExists(string field) {
-            return this.AppendParameter(field, "$exists", false);
+            return AppendParameter(field, "$exists", false);
         }
 
         /// <summary>
         /// Finds fields that match any value within the record
         /// </summary>
         public MongoQuery In(string field, IEnumerable values) {
-            return this.In(field, values.Cast<object>().ToArray());
+            return In(field, values.Cast<object>().ToArray());
         }
 
         /// <summary>
         /// Finds fields that match any value within the record
         /// </summary>
         public MongoQuery In(string field, params object[] values) {
-            return this.AppendParameter(field, "$in", values);
+            return AppendParameter(field, "$in", values);
         }
 
         /// <summary>
         /// Finds fields that haven't any matches within the collection
         /// </summary>
         public MongoQuery NotIn(string field, IEnumerable values) {
-            return this.NotIn(field, values.Cast<object>().ToArray());
+            return NotIn(field, values.Cast<object>().ToArray());
         }
 
         /// <summary>
         /// Finds fields that haven't any matches within the array
         /// </summary>
         public MongoQuery NotIn(string field, params object[] values) {
-            return this.AppendParameter(field, "$nin", values);
+            return AppendParameter(field, "$nin", values);
         }
 
         /// <summary>
         /// Finds fields that match all value within the record
         /// </summary>
         public MongoQuery Size(string field, int size) {
-            return this.AppendParameter(field, "$size", size);
+            return AppendParameter(field, "$size", size);
         }
 
         /// <summary>
         /// Finds fields that match all value within the record
         /// </summary>
         public MongoQuery All(string field, IEnumerable values) {
-            return this.All(field, values.Cast<object>().ToArray());
+            return All(field, values.Cast<object>().ToArray());
         }
 
         /// <summary>
         /// Finds fields that match all value within the record
         /// </summary>
         public MongoQuery All(string field, params object[] values) {
-            return this.AppendParameter(field, "$all", values);
+            return AppendParameter(field, "$all", values);
         }
 
         /// <summary>
         /// Performs a modulo comparison (field % value == 1)
         /// </summary>
         public MongoQuery Mod(string field, int value) {
-            return this.Mod(field, value, 1);
+            return Mod(field, value, 1);
         }
 
         /// <summary>
         /// Performs a modulo comparison (field % value == compare)
         /// </summary>
         public MongoQuery Mod(string field, int value, int compare) {
-            return this.AppendParameter(field, "$mod", new int[] { value, compare});
+            return AppendParameter(field, "$mod", new[] { value, compare});
         }
 
         #endregion
@@ -320,28 +319,28 @@ namespace CSMongo.Query {
         /// Selects only one document with the provided parameters
         /// </summary>
         public MongoDocument SelectOne() {
-            return this.SelectOne(Mongo.DefaultSkipCount, QueryOptionTypes.None);
+            return SelectOne(Mongo.DefaultSkipCount, QueryOptionTypes.None);
         }
 
         /// <summary>
         /// Selects only one document with the provided parameters
         /// </summary>
         public MongoDocument SelectOne(int skip) {
-            return this.SelectOne(skip, QueryOptionTypes.None);
+            return SelectOne(skip, QueryOptionTypes.None);
         }
 
         /// <summary>
         /// Selects only one document with the provided parameters
         /// </summary>
         public MongoDocument SelectOne(QueryOptionTypes options) {
-            return this.SelectOne(Mongo.DefaultSkipCount, QueryOptionTypes.None);
+            return SelectOne(Mongo.DefaultSkipCount, QueryOptionTypes.None);
         }
 
         /// <summary>
         /// Selects only one document with the provided parameters
         /// </summary>
         public MongoDocument SelectOne(params string[] fields) {
-            return this.SelectOne(Mongo.DefaultSkipCount, QueryOptionTypes.None, fields);
+            return SelectOne(Mongo.DefaultSkipCount, QueryOptionTypes.None, fields);
         }
 
         /// <summary>
@@ -404,11 +403,10 @@ namespace CSMongo.Query {
         /// Selects the records from the database that matches this query
         /// </summary>
         public IEnumerable<MongoDocument> Select(int skip, int take, QueryOptionTypes options, params string[] fields) {
-            //todo: this is just a temp entry to fix the 101 limit on returned query count
-            if (take <= 0) take = 10000000;
+            if (take <= 0) take = int.MaxValue; //if this is not set, only 101 docs (max) will be returned
             //create the request to use
             var request = new QueryRequest(Collection);
-            if (fields!=null) request.Fields.AddRange(fields); 
+            if (fields!=null && fields.Length>0) request.Fields.AddRange(fields); 
             request.Skip = skip;
             request.Take = take;
             request.Options = options;
@@ -418,13 +416,37 @@ namespace CSMongo.Query {
             var response = Collection.Database.Connection
                 .SendRequest(request) as QueryResponse;
 
-            //save this cursor for later
-            var cursor = new MongoCursor(request, response.CursorId, response.TotalReturned);
-            Collection.Database.RegisterCursor(cursor);
 
             //and return the records
-            IEnumerable<MongoDocument> documents = response.Documents.AsEnumerable();
-            Collection.UpdateOnSubmit(documents);
+            var documents = response.Documents.AsEnumerable().ToList();
+
+            //get all other records using the cursor
+            if (response.CursorId > 0)
+            {
+
+                //save this cursor for later
+                var cursor = new MongoCursor(request, response.CursorId, response.TotalReturned);
+                Collection.Database.RegisterCursor(cursor); //just keeping it. Don't think it will hurt much to just keep it.
+
+                int max;
+                while ((max = take - documents.Count) > 0)
+                {
+                    var docs = Collection.Database.GetMore(cursor, max);
+                    if (docs.Count() == 0) break;
+                    if (docs.Count() < max) documents.AddRange(docs);
+                    else
+                    {
+                        documents.AddRange(docs.Take(max));
+                        break;
+                    }
+                }
+                //kill the cursor. is this really necessary? it appears it is killed automatically when the data is read to completion.
+                MongoDatabaseCommands.KillCursors(Collection.Database, new[] {response.CursorId});
+            }
+
+
+            if (!Collection.InReadOnlyMode) Collection.UpdateOnSubmit(documents); //do not store this list if readonly
+
             return documents;
 
         }
@@ -706,7 +728,7 @@ namespace CSMongo.Query {
         /// or adds the new item to object entirely
         /// </summary>
         public void Set(object changes) {
-            this.Set(new BsonDocument(changes));
+            Set(new BsonDocument(changes));
         }
 
         /// <summary>
@@ -714,7 +736,7 @@ namespace CSMongo.Query {
         /// or adds the new item to object entirely
         /// </summary>
         public void Set(BsonDocument document) {
-            this._SendUpdate("$set", UpdateOptionTypes.MultiUpdate, document);
+            _SendUpdate("$set", UpdateOptionTypes.MultiUpdate, document);
         }
         #endregion
 
@@ -730,7 +752,7 @@ namespace CSMongo.Query {
             }
 
             //send the command
-            this._SendUpdate("$unset", UpdateOptionTypes.MultiUpdate, remove);
+            _SendUpdate("$unset", UpdateOptionTypes.MultiUpdate, remove);
 
         }
 
@@ -755,7 +777,7 @@ namespace CSMongo.Query {
         /// converting the value to an integer
         /// </summary>
         public void Increment(object parameters) {
-            this.Increment(new BsonDocument(parameters));
+            Increment(new BsonDocument(parameters));
         }
 
         /// <summary>
@@ -771,7 +793,7 @@ namespace CSMongo.Query {
             }
 
             //send the update request
-            this._SendUpdate("$inc", UpdateOptionTypes.MultiUpdate, document);
+            _SendUpdate("$inc", UpdateOptionTypes.MultiUpdate, document);
 
         }
 
@@ -860,7 +882,11 @@ namespace CSMongo.Query {
             _sortParameters.Set(field, ascending ? 1 : -1);
             return this;
         }
-
+        /// <summary>
+        /// Sorts the collection using fields in the passsed in document
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <returns></returns>
         public MongoQuery SortBy(BsonDocument doc)
         {
             if (doc != null)

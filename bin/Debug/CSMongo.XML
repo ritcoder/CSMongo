@@ -575,7 +575,7 @@
         </member>
         <member name="P:CSMongo.Requests.RequestBase.ResponseId">
             <summary>
-            The curretn ResponseID for this request
+            The current ResponseID for this request
             </summary>
         </member>
         <member name="M:CSMongo.Requests.CollectionRequestBase.#ctor(CSMongo.Types.OpCodeTypes,CSMongo.MongoCollection)">
@@ -1580,7 +1580,7 @@
             Finds all records that are equal to the value provided
             </summary>
         </member>
-        <member name="M:CSMongo.Query.MongoQuery.EqualTo(CSMongo.MongoDocument)">
+        <member name="M:CSMongo.Query.MongoQuery.EqualTo(CSMongo.Bson.BsonDocument)">
             <summary>
             Finds all records that have fields with values equal to that of the document provided
             </summary>
@@ -1973,6 +1973,13 @@
             <param name="ascending">if set to <c>true</c> sorting will be in [ascending] order.</param>
             <returns></returns>
         </member>
+        <member name="M:CSMongo.Query.MongoQuery.SortBy(CSMongo.Bson.BsonDocument)">
+            <summary>
+            Sorts the collection using fields in the passsed in document
+            </summary>
+            <param name="doc"></param>
+            <returns></returns>
+        </member>
         <member name="M:CSMongo.Query.MongoQuery.MapReduce(System.String,System.String,CSMongo.Types.MapReduceParameters,System.Int32)">
             <summary>
             Runs M/R on the given collection
@@ -2150,6 +2157,7 @@
         <member name="M:CSMongo.MongoCollection.InsertOnSubmit(CSMongo.MongoDocument)">
             <summary>
             Adds a record to be inserted when changes are submitted
+            If the document contains a field with name as _upsert, it uses <c>UpsertOnInsert</c>
             </summary>
         </member>
         <member name="M:CSMongo.MongoCollection.InsertOnSubmit(System.Collections.Generic.IEnumerable{CSMongo.MongoDocument})">
@@ -2255,6 +2263,12 @@
             <param name="setDoc"></param>
             <param name="unsetDoc"></param>
         </member>
+        <member name="M:CSMongo.MongoCollection.ValidateState(System.Boolean)">
+            <summary>
+            Checks the state of the operation against the state of the collection. Write operations are not permitted when InReadOnlyMode is true
+            </summary>
+            <param name="write"></param>
+        </member>
         <member name="P:CSMongo.MongoCollection.Name">
             <summary>
             The name of the collection to query
@@ -2268,6 +2282,12 @@
         <member name="P:CSMongo.MongoCollection.Connection">
             <summary>
             Returns the connection used for this request
+            </summary>
+        </member>
+        <member name="P:CSMongo.MongoCollection.InReadOnlyMode">
+            <summary>
+            Gets or sets whether the collection is in read only mode.
+            In read only mode, history of query documents are not kept. Also, inserts, updates and upserts will throw exceptions
             </summary>
         </member>
         <member name="M:CSMongo.DataTypes.MongoDate.GetDataType">
@@ -2365,6 +2385,16 @@
         <member name="P:CSMongo.MongoCursor.HasCursor">
             <summary>
             Make certain there is a real cursor to use
+            </summary>
+        </member>
+        <member name="T:CSMongo.Exceptions.ReadonlyCollectionException">
+            <summary>
+            Thrown when a non query operation is performed on a read only collection
+            </summary>
+        </member>
+        <member name="M:CSMongo.Exceptions.ReadonlyCollectionException.#ctor">
+            <summary>
+            Thrown when a non query operation is performed on a read only collection
             </summary>
         </member>
         <member name="T:CSMongo.Results.DatabaseDetailResult">
@@ -3218,7 +3248,7 @@
             Attempts to assign the values of a BsonObject into new Anonymous Type values. It attempted to extract the id as well
             </summary>
         </member>
-        <member name="F:CSMongo.Types.OpCodeTypes.GetByOid">
+        <member name="F:CSMongo.Types.OpCodeTypes.Reserved">
             <summary>
             (Apparently not used)
             </summary>

@@ -14,7 +14,7 @@
         /// <summary>
         /// (Apparently not used)
         /// </summary>
-        GetByOid = 2003,
+        Reserved = 2003,
 
         Query = 2004,
 

@@ -50,7 +50,7 @@ namespace CSMongo.IO {
         /// Returns the current length of the stream
         /// </summary>
         public int Length {
-            get { return this._Output.Count; }
+            get { return _Output.Count; }
         }
 
         #endregion
@@ -61,73 +61,73 @@ namespace CSMongo.IO {
         /// Inserts a new byte at the specified index
         /// </summary>
         public void InsertAt(int index, byte[] bytes) {
-            this._Reset();
-            this._Output.InsertRange(index, bytes);
+            _Reset();
+            _Output.InsertRange(index, bytes);
         }
 
         /// <summary>
         /// Inserts new bytes at the specified index
         /// </summary>
         public void InsertAt(int index, byte @byte) {
-            this._Reset();
-            this._Output.Insert(index, @byte);
+            _Reset();
+            _Output.Insert(index, @byte);
         }
 
         /// <summary>
         /// Overwrites the byte at the specified index
         /// </summary>
         public void WriteAt(int index, byte @byte) {
-            this._Reset();
-            this._Output.RemoveAt(index);
-            this.InsertAt(index, @byte);
+            _Reset();
+            _Output.RemoveAt(index);
+            InsertAt(index, @byte);
         }
 
         /// <summary>
         /// Overwrites the bytes the the specified index
         /// </summary>
         public void WriteAt(int index, byte[] bytes) {
-            this._Reset();
-            this._Output.RemoveRange(index, bytes.Length);
-            this.InsertAt(index, bytes);
+            _Reset();
+            _Output.RemoveRange(index, bytes.Length);
+            InsertAt(index, bytes);
         }
 
         /// <summary>
         /// Appends the byte to the end of the stream
         /// </summary>
         public void Append(byte @byte) {
-            this._Reset();
-            this._Output.Add(@byte);
+            _Reset();
+            _Output.Add(@byte);
         }
 
         /// <summary>
         /// Appends the bytes to the end of the stream
         /// </summary>
         public void Append(byte[] bytes) {
-            this._Reset();
-            this._Output.InsertRange(this._Output.Count, bytes);
+            _Reset();
+            _Output.InsertRange(_Output.Count, bytes);
         }
 
         /// <summary>
         /// Reads the bytes within the specified area
         /// </summary>
         public byte[] Read(int start, int length) {
-            return this._Output.Skip(start).Take(length).ToArray();
+            return _Output.Skip(start).Take(length).ToArray();
         }
 
         /// <summary>
         /// Returns all of the bytes for the stream as an array
         /// </summary>
         public byte[] ToArray() {
-            if (this._Generated == null) {
-                this._Generated = this._Output.ToArray();
+            if (_generated == null) {
+                _generated = _Output.ToArray();
             }
-            return this._Generated;
+            return _generated;
         }
-        private byte[] _Generated;
+        private byte[] _generated;
 
         //clears the saved array of bytes, if any
         private void _Reset() {
-            this._Generated = null;
+            _generated = null;
         }
 
         #endregion

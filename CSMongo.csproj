@@ -56,6 +56,7 @@
     <Compile Include="Bson\BsonAnonymousTypeParser.cs" />
     <Compile Include="DataTypes\MongoRegexType.cs" />
     <Compile Include="Exceptions\ConnectionNotOpenedException.cs" />
+    <Compile Include="Exceptions\ReadonlyCollectionException.cs" />
     <Compile Include="Exceptions\InvalidMongoConnectionStringException.cs" />
     <Compile Include="Exceptions\MissingCollectionNameException.cs" />
     <Compile Include="Exceptions\MongoTypeAlreadyRegisteredException.cs" />

@@ -23,7 +23,7 @@ namespace CSMongo.Commands {
         /// </summary>
         public static void LogOut(MongoDatabase database) {
             try {
-                MongoDatabaseCommands.RunCommand(database, new { logout = Mongo.CommandArgument });
+                RunCommand(database, new { logout = Mongo.CommandArgument });
             }
             //intentional -- ignore errors
             //I think this is a good idea...
@@ -39,7 +39,7 @@ namespace CSMongo.Commands {
             database.Connection.Open();
 
             //get the values required
-            GetNonceResult nonce = MongoDatabaseCommands.GetNonce(database);
+            GetNonceResult nonce = GetNonce(database);
             if (!nonce.HasNonce) {
                 throw new MongoServerException(string.Format("Unable to get a nonce value from {0}.", database.Connection.Host));
             }
@@ -66,7 +66,7 @@ namespace CSMongo.Commands {
         /// Loads the 'nonce' value for password hashing
         /// </summary>
         public static GetNonceResult GetNonce(MongoDatabase database) {
-            CommandResponse response = MongoDatabaseCommands.RunCommand(database, new { getnonce = Mongo.CommandArgument });
+            CommandResponse response = RunCommand(database, new { getnonce = Mongo.CommandArgument });
             return new GetNonceResult(response.GetDefaultResponse());
         }
 
@@ -74,7 +74,7 @@ namespace CSMongo.Commands {
         /// Sends the request to kill existing cursors
         /// </summary>
         public static void KillCursors(MongoDatabase database, IEnumerable<MongoCursor> cursors) {
-            MongoDatabaseCommands.KillCursors(database, cursors.Where(item => item.Cursor > 0).Select(item => item.Cursor));
+            KillCursors(database, cursors.Where(item => item.Cursor > 0).Select(item => item.Cursor));
         }
 
         /// <summary>
@@ -86,16 +86,15 @@ namespace CSMongo.Commands {
             if (cursors.Count() == 0) { return; }
 
             //send the command to work
-            KillCursorsRequest request = new KillCursorsRequest(cursors);
-            QueryResponse response = database.SendRequest(request) as QueryResponse;
-
+            var request = new KillCursorsRequest(cursors);
+            database.SendRequest(request);
         }
 
         /// <summary>
         /// Causes the Mongo server to shutdown - No response is expected
         /// </summary>
         public static MethodResult ResetErrors(MongoDatabase database) {
-            CommandResponse response = MongoDatabaseCommands.RunCommand(database, new { reseterror = Mongo.CommandArgument });
+            CommandResponse response = RunCommand(database, new { reseterror = Mongo.CommandArgument });
             return new MethodResult(response.GetDefaultResponse());
         }
 
@@ -103,7 +102,7 @@ namespace CSMongo.Commands {
         /// Gets the most recent error from the database
         /// </summary>
         public static GetLastErrorResult GetLastError(MongoDatabase database) {
-            CommandResponse response = MongoDatabaseCommands.RunCommand(database, new { getlasterror = Mongo.CommandArgument });
+            CommandResponse response = RunCommand(database, new { getlasterror = Mongo.CommandArgument });
             return new GetLastErrorResult(response.GetDefaultResponse());
         }
 
@@ -135,7 +134,7 @@ namespace CSMongo.Commands {
         /// Returns OpTime for the provided database
         /// </summary>
         public static GetOpTimeResult GetOpTime(MongoDatabase database) {
-            CommandResponse result = MongoDatabaseCommands.RunCommand(database, new { getoptime = Mongo.CommandArgument });
+            CommandResponse result = RunCommand(database, new { getoptime = Mongo.CommandArgument });
             return new GetOpTimeResult(result.GetDefaultResponse());
         }
 
@@ -143,7 +142,7 @@ namespace CSMongo.Commands {
         /// Clones the current database from the provided host to this server
         /// </summary>
         public static MethodResult Clone(MongoDatabase database, string host) {
-            CommandResponse result = MongoDatabaseCommands.RunCommand(database, new { clone = host });
+            CommandResponse result = RunCommand(database, new { clone = host });
             return new MethodResult(result.GetDefaultResponse());
         }
 
@@ -151,7 +150,7 @@ namespace CSMongo.Commands {
         /// Sets and returns the previous profiling level
         /// </summary>
         public static ProfileResult SetProfileLevel(MongoDatabase database, int level) {
-            CommandResponse result = MongoDatabaseCommands.RunCommand(database, new { profile = level });
+            CommandResponse result = RunCommand(database, new { profile = level });
             return new ProfileResult(result.GetDefaultResponse());
         }
 
@@ -159,7 +158,7 @@ namespace CSMongo.Commands {
         /// Returns the count of records from the specified collection
         /// </summary>
         public static CollectionCountResult CollectionCount(MongoDatabase database, string collection) {
-            return MongoDatabaseCommands.CollectionCount(database, collection, new { });
+            return CollectionCount(database, collection, new { });
         }
 
         /// <summary>
@@ -167,7 +166,7 @@ namespace CSMongo.Commands {
         /// that meet the criteria for the query 
         /// </summary>
         public static CollectionCountResult CollectionCount(MongoDatabase database, string collection, object query) {
-            return MongoDatabaseCommands.CollectionCount(database, collection, new BsonObject(query));
+            return CollectionCount(database, collection, new BsonObject(query));
         }
 
         /// <summary>

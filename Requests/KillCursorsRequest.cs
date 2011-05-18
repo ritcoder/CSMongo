@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using CSMongo.IO;
 using CSMongo.Bson;
 using CSMongo.Types;
-using CSMongo.Responses;
-using System.IO;
 
 namespace CSMongo.Requests {
 
@@ -22,7 +18,7 @@ namespace CSMongo.Requests {
         /// </summary>
         public KillCursorsRequest(IEnumerable<long> cursors)
             : base(OpCodeTypes.KillCursors) {
-            this.Cursors = cursors;
+            Cursors = cursors;
         }
 
         #endregion
@@ -47,11 +43,10 @@ namespace CSMongo.Requests {
             stream.Append(BsonTranslator.AsInt32(0));
 
             //then the number of cursors being written
-            int count = this.Cursors.Count();
-            stream.Append(BsonTranslator.AsInt32(this.Cursors.Count()));
+            stream.Append(BsonTranslator.AsInt32(Cursors.Count()));
 
             //write each of the items to the stream
-            foreach (long cursor in this.Cursors.ToArray()) {
+            foreach (var cursor in Cursors.ToArray()) {
                 stream.Append(BsonTranslator.AsInt64(cursor));
             }
 

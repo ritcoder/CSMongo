@@ -65,7 +65,6 @@ namespace CSMongo {
         }
         private static int _DefaultGetMoreReturnCount = DEFAULT_RETURN_COUNT;
         private const int DEFAULT_RETURN_COUNT = 1000;
-    
     }
 
 }

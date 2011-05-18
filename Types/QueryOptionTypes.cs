@@ -12,7 +12,9 @@
 
         SlaveOK = 4,
 
-        NoCursorTimeout = 16
+        NoCursorTimeout = 16,
+
+        Exhaust = 64
 
     }
 

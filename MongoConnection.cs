@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Net.Sockets;
 using System.IO;
 using CSMongo.Requests;
@@ -42,9 +39,9 @@ namespace CSMongo {
         /// Creates a new Mongo connection
         /// </summary>
         public MongoConnection(string host, int port, bool autoConnect) {
-            this.Host = (host ?? string.Empty).Trim();
-            this.Port = port;
-            this.AutoConnect = autoConnect;
+            Host = (host ?? string.Empty).Trim();
+            Port = port;
+            AutoConnect = autoConnect;
         }
 
         #endregion
@@ -70,13 +67,14 @@ namespace CSMongo {
         /// Returns of this connection is currently open or not
         /// </summary>
         public bool Connected {
-            get { return this._Client is TcpClient && this._Client.Connected; }
+            get { return _client != null && _client.Connected; }
         }
 
         //the current connection to the host
-        private TcpClient _Client;
-        private BufferedStream _Buffer;
-        private BinaryWriter _Writer;
+        private TcpClient _client;
+        private BufferedStream _buffer;
+        //private NetworkStream _buffer; //remove this
+        private BinaryWriter _writer;
 
         #endregion
 
@@ -85,22 +83,22 @@ namespace CSMongo {
         /// <summary>
         /// Event raised just before the database is closed
         /// </summary>
-        public event Action<MongoConnection> BeforeConnectionOpened = (connection) => { };
+        public event Action<MongoConnection> BeforeConnectionOpened = connection => { };
 
         /// <summary>
         /// Event raised when right after the database is closed
         /// </summary>
-        public event Action<MongoConnection> AfterConnectionOpen = (connection) => { };
+        public event Action<MongoConnection> AfterConnectionOpen = connection => { };
 
         /// <summary>
         /// Event raised just before the database is closed
         /// </summary>
-        public event Action<MongoConnection> BeforeConnectionClosed = (connection) => { };
+        public event Action<MongoConnection> BeforeConnectionClosed = connection => { };
 
         /// <summary>
         /// Event raised when right after the database is closed
         /// </summary>
-        public event Action<MongoConnection> AfterConnectionClosed = (connection) => { };
+        public event Action<MongoConnection> AfterConnectionClosed = connection => { };
 
         #endregion
 
@@ -116,10 +114,11 @@ namespace CSMongo {
             if (BeforeConnectionOpened != null) { BeforeConnectionOpened(this); }
 
             //and then try and open the connection
-            _Client = new TcpClient();
-            _Client.Connect(Host, Port);
-            _Buffer = new BufferedStream(_Client.GetStream());
-            _Writer = new BinaryWriter(_Buffer);
+            _client = new TcpClient();
+            _client.Connect(Host, Port);
+            _buffer = new BufferedStream(_client.GetStream());
+            //_buffer = _client.GetStream(); //remove this
+            _writer = new BinaryWriter(_buffer);
 
             //notify this has been connected
             if (AfterConnectionOpen != null) { AfterConnectionOpen(this); }
@@ -132,15 +131,15 @@ namespace CSMongo {
         public void Close() {
 
             //notify any event handlers
-            if (this.BeforeConnectionClosed != null) { this.BeforeConnectionClosed(this); }
+            if (BeforeConnectionClosed != null) { BeforeConnectionClosed(this); }
 
             //close up all of the streams
-            if (_Buffer != null) { _Buffer.Dispose(); }
-            if (_Writer != null) { _Writer.Close(); }
-            if (_Client != null) { _Client.Close(); }
+            if (_buffer != null) { _buffer.Dispose(); }
+            if (_writer != null) { _writer.Close(); }
+            if (_client != null) { _client.Close(); }
 
             //and then finally any event handling
-            if (this.AfterConnectionClosed != null) { this.AfterConnectionClosed(this); }
+            if (AfterConnectionClosed != null) { AfterConnectionClosed(this); }
         }
 
         /// <summary>
@@ -160,15 +159,15 @@ namespace CSMongo {
                 }
 
                 //send the header first
-                _Writer.Write(request.GetHeader());
-                _Writer.Flush();
+                _writer.Write(request.GetHeader());
+                _writer.Flush();
 
                 //then the rest of the content
-                _Writer.Write(request.GetBody());
-                _Writer.Flush();
+                _writer.Write(request.GetBody());
+                _writer.Flush();
 
                 //next, read for the response
-                return request.OnResponse(_Buffer);
+                return request.OnResponse(_buffer);
 
             }
             //forward the exception onto the caller
@@ -195,7 +194,7 @@ namespace CSMongo {
         /// Handles disconnecting and disposing a connection
         /// </summary>
         public virtual void Dispose() {
-            this.Close();
+            Close();
         }
 
         #endregion

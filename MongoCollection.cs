@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CSMongo.Exceptions;
 using CSMongo.Requests;
 using CSMongo.Commands;
 using CSMongo.Results;
@@ -36,6 +37,16 @@ namespace CSMongo {
 
         #endregion
 
+        #region Fields
+        //update information
+        internal List<MongoDocument> _Inserts;
+        internal List<MongoDocument> _Deletes;
+
+        //document with a hashcode to track changes
+        internal List<KeyValuePair<string, MongoDocument>> _Updates;
+        internal List<KeyValuePair<string, MongoDocument>> _Upserts;
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -54,15 +65,11 @@ namespace CSMongo {
         public MongoConnection Connection {
             get { return Database.Connection; }
         }
-
-        //update information
-        internal List<MongoDocument> _Inserts;
-        internal List<MongoDocument> _Deletes;
-
-        //document with a hashcode to track changes
-        internal List<KeyValuePair<string, MongoDocument>> _Updates;
-        internal List<KeyValuePair<string, MongoDocument>> _Upserts;
-
+        /// <summary>
+        /// Gets or sets whether the collection is in read only mode.
+        /// In read only mode, history of query documents are not kept. Also, inserts, updates and upserts will throw exceptions
+        /// </summary>
+        public bool InReadOnlyMode { get; set; }
         #endregion
 
         #region Helper query procs
@@ -143,7 +150,7 @@ namespace CSMongo {
         /// Returns the current count of records for the database
         /// </summary>
         public long Count() {
-            return this.Find().Count();
+            return Find().Count();
         }
 
         #endregion
@@ -154,16 +161,19 @@ namespace CSMongo {
         /// Adds a record to be inserted when changes are submitted
         /// </summary>
         public void InsertOnSubmit(object document) {
+            ValidateState();
             if (document is MongoDocument)
                 InsertOnSubmit((MongoDocument)document);
             else
-                this._Inserts.Add(new MongoDocument(document));
+                _Inserts.Add(new MongoDocument(document));
         }
 
         /// <summary>
         /// Adds a record to be inserted when changes are submitted
+        /// If the document contains a field with name as _upsert, it uses <c>UpsertOnInsert</c>
         /// </summary>
         public void InsertOnSubmit(MongoDocument document) {
+            ValidateState();
             _Inserts.Add(document);
         }
 
@@ -171,6 +181,7 @@ namespace CSMongo {
         /// Adds a set of records to be inserted when changes are submitted
         /// </summary>
         public void InsertOnSubmit(IEnumerable<MongoDocument> documents) {
+            ValidateState();
             _Inserts.AddRange(documents);
         }
 
@@ -178,6 +189,7 @@ namespace CSMongo {
         /// Adds a record to be deleted when changes are submitted
         /// </summary>
         public void DeleteOnSubmit(MongoDocument document) {
+            ValidateState();
             _Deletes.Add(document);
         }
 
@@ -185,6 +197,7 @@ namespace CSMongo {
         /// Adds a set of records to be deleted when changes are submitted
         /// </summary>
         public void DeleteOnSubmit(IEnumerable<MongoDocument> documents) {
+            ValidateState();
             _Deletes.AddRange(documents);
         }
 
@@ -199,7 +212,7 @@ namespace CSMongo {
         /// Appends a document to monitor for changes and updates
         /// </summary>
         public void UpdateOnSubmit(IEnumerable<MongoDocument> documents) {
-
+            ValidateState();
             //append each of the items to the updates
             foreach (var update in documents) {
                 if (_Updates.Any(item => item.Value.Equals(update))) { return; }
@@ -221,6 +234,7 @@ namespace CSMongo {
         /// <param name="documents">The documents to upsert</param>
         public void UpsertOnSubmit(IEnumerable<MongoDocument> documents)
         {
+            ValidateState();
             foreach (var doc in documents)
             {
                 var key = new BsonDocument();
@@ -248,6 +262,7 @@ namespace CSMongo {
         /// </summary>
         public void SubmitChanges() {
 
+            ValidateState();
             //check for changes
             if (_Inserts.Count > 0) { _PerformInserts(); }
             if (_Updates.Count > 0) { _PerformUpdates(); }
@@ -263,15 +278,15 @@ namespace CSMongo {
 
         //handles inserting records waiting
         private void _PerformInserts() {
-            InsertRequest insert = new InsertRequest(this);
-            insert.Documents.AddRange(this._Inserts);
-            this.Connection.SendRequest(insert);
+            var insert = new InsertRequest(this);
+            insert.Documents.AddRange(_Inserts);
+            Connection.SendRequest(insert);
         }
 
         //handles updating records that are changed
         private void _PerformUpdates() {
             //check for changed items and update them now
-            foreach (KeyValuePair<string, MongoDocument> item in _Updates) {
+            foreach (var item in _Updates) {
 
                 //if this hasn't changed then skip it
                 if (item.Key.Equals(item.Value.GetObjectHash())) { continue; }
@@ -304,7 +319,7 @@ namespace CSMongo {
         {
 
             //check for changed items and update them now
-            foreach (var item in this._Upserts)
+            foreach (var item in _Upserts)
             {
 
                 //create a bson document of the update to create
@@ -328,8 +343,8 @@ namespace CSMongo {
 
         //handles deleting records that need to be removed
         private void _PerformDeletes() {
-            IEnumerable<MongoOid> ids = this._Deletes.Select(item => item.Id);
-            this.Database.From(this.Name).In("_id", ids).Delete();
+            var ids = _Deletes.Select(item => item.Id);
+            Database.From(Name).In("_id", ids).Delete();
         }
 
         #endregion
@@ -340,28 +355,28 @@ namespace CSMongo {
         /// Removes a collection from the database
         /// </summary>
         public DropCollectionResult DropCollection() {
-            return this.Database.DropCollection(this.Name);
+            return Database.DropCollection(Name);
         }
 
         /// <summary>
         /// Returns details about the status of this collection
         /// </summary>
         public CollectionStatsResult GetStatus() {
-            return MongoDatabaseCommands.GetCollectionStats(this.Database, this.Name);
+            return MongoDatabaseCommands.GetCollectionStats(Database, Name);
         }
 
         /// <summary>
         /// Removes all indexes from this collection
         /// </summary>
         public DeleteCollectionIndexResult DeleteIndex() {
-            return this.Database.DeleteCollectionIndex(this.Name);
+            return this.Database.DeleteCollectionIndex(Name);
         }
 
         /// <summary>
         /// Removes the specified index from this collection
         /// </summary>
         public DeleteCollectionIndexResult DeleteIndex(string collection, string index) {
-            return this.Database.DeleteCollectionIndex(collection, index);
+            return Database.DeleteCollectionIndex(collection, index);
         }
 
         #endregion
@@ -455,44 +470,19 @@ namespace CSMongo {
             if (setDoc!=null) request.Modifications["$set"] = setDoc;
             if (unsetDoc != null) request.Modifications["$unset"] = unsetDoc;
             request.Parameters.Merge(queryDoc);
-            //request.Parameters["$in"] = new[] { item.Value.Id };
             Database.SendRequest(request);
-            //Find().Set();
-            ////check for changed items and update them now
-            //foreach (KeyValuePair<string, MongoDocument> item in _Updates)
-            //{
 
-            //    //if this hasn't changed then skip it
-            //    if (item.Key.Equals(item.Value.GetObjectHash())) { continue; }
+        }
+        #endregion
 
-            //    /*//create a bson document of the update to create
-            //    var update = new BsonDocument();
-            //    update.Merge(item.Value);
-            //    update.Remove(Mongo.DocumentIdKey);
-
-            //    //start with the update
-            //    this.Find().FindById(item.Value.Id).Set(update);
-
-            //    //check for anything removed
-            //    var removed = item.Value.GetRemovedFields();
-            //    if (removed.Count() > 0) {
-            //        Find().FindById(item.Value.Id).Unset(removed.ToArray());
-            //    }*/
-
-            //    //Might want to try and merge this into the same
-            //    //request to avoid two trips to the database -- But
-            //    //this might cause an issue with older versions of
-            //    //the same database since an unset call would cause
-            //    //the inital set request to fail...
-
-            //    var request = new UpdateRequest(this);
-            //    request.Modifications["$set"] = item.Value;
-            //    request.Modifications["$unset"] = item.Value.GetRemovedFields();
-            //    request.Parameters["$in"] = new[] { item.Value.Id };
-            //    Database.SendRequest(request);
-
-            //}
-
+        #region Helpers
+        /// <summary>
+        /// Checks the state of the operation against the state of the collection. Write operations are not permitted when InReadOnlyMode is true
+        /// </summary>
+        /// <param name="write"></param>
+        private void ValidateState(bool write=true)
+        {
+            if (write && InReadOnlyMode) throw new ReadonlyCollectionException();
         }
         #endregion
     }

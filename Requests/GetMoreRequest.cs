@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CSMongo.IO;
+﻿using CSMongo.IO;
 using CSMongo.Types;
 using CSMongo.Bson;
 using CSMongo.Responses;
@@ -19,8 +15,8 @@ namespace CSMongo.Requests {
         /// </summary>
         public GetMoreRequest(MongoCollection collection, MongoCursor cursor, int count)
             : base(OpCodeTypes.GetMore, collection) {
-            this.Cursor = cursor;
-            this.Count = count;
+            Cursor = cursor;
+            Count = count;
         }
 
         #endregion
@@ -50,13 +46,13 @@ namespace CSMongo.Requests {
             stream.Append(BsonTranslator.AsInt32(0));
 
             //the name of the collection
-            stream.Append(BsonTranslator.AsString(this.Cursor.Query.GetDatabaseTarget()));
+            stream.Append(BsonTranslator.AsString(Cursor.Query.GetDatabaseTarget()));
 
             //the total records to select
-            stream.Append(BsonTranslator.AsInt32(this.Count));
+            stream.Append(BsonTranslator.AsInt32(Count));
 
             //required ZERO byte
-            stream.Append(BsonTranslator.AsInt64(this.Cursor.Cursor));
+            stream.Append(BsonTranslator.AsInt64(Cursor.Cursor));
 
         }
 

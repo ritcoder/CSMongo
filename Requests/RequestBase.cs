@@ -52,7 +52,7 @@ namespace CSMongo.Requests {
         public int RequestId { get; set; }
 
         /// <summary>
-        /// The curretn ResponseID for this request
+        /// The current ResponseID for this request
         /// </summary>
         public int ResponseId { get; set; }
 

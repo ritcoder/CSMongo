@@ -22,8 +22,8 @@ namespace CSMongo {
         /// Uses the connection string information to access a database
         /// </summary>
         public MongoDatabase(string connectionString) {
-            MongoConnectionString connection = MongoConnectionString.Parse(connectionString);
-            this._SetupDatabase(
+            var connection = MongoConnectionString.Parse(connectionString);
+            SetupDatabase(
                 connection.Database, 
                 connection.Host, 
                 connection.Port, 
@@ -58,7 +58,8 @@ namespace CSMongo {
         /// Uses a connection to refer to a Mongo database
         /// </summary>
         public MongoDatabase(string database, string host, int port, bool autoConnect)
-            : this(database, host, port, null, null, true) {
+            : this(database, host, port, null, null, autoConnect)
+        {
         }
 
         /// <summary>
@@ -72,7 +73,7 @@ namespace CSMongo {
         /// Uses a connection to refer to a Mongo database
         /// </summary>
         public MongoDatabase(string database, string host, int port, string username, string password, bool autoConnect) {
-            this._SetupDatabase(database, host, port, username, password, autoConnect);
+            SetupDatabase(database, host, port, username, password, autoConnect);
         }
 
         #endregion
@@ -80,21 +81,21 @@ namespace CSMongo {
         #region Additional Setup
 
         //registers additional events to handle 
-        private void _SetupDatabase(string database, string host, int port, string username, string password, bool autoConnect) {
+        private void SetupDatabase(string database, string host, int port, string username, string password, bool autoConnect) {
 
             //assign the connection information
-            this.Name = database;
-            this.Connection = new MongoConnection(host, port, autoConnect);
-            this.Username = (username ?? string.Empty).Trim();
-            this.Password = password ?? string.Empty;
+            Name = database;
+            Connection = new MongoConnection(host, port, autoConnect);
+            Username = (username ?? string.Empty).Trim();
+            Password = password ?? string.Empty;
 
             //setup some of the properties
-            this.HasAuthenticated = false;
-            this._Cursors = new List<MongoCursor>();
-            this._Collections = new Dictionary<string, MongoCollection>();
+            HasAuthenticated = false;
+            _cursors = new List<MongoCursor>();
+            _collections = new Dictionary<string, MongoCollection>();
 
             //register the events
-            this.Connection.AfterConnectionOpen += (connection) => { this.Authenticate(); };
+            Connection.AfterConnectionOpen += connection => Authenticate();
         }
 
         #endregion
@@ -132,7 +133,7 @@ namespace CSMongo {
         //keeps track of an authentication attempt since an
         //authentication attempt requires that two commands
         //and would cause the first command to execute over and over
-        private bool _IsAttemptingAuthentication = false;
+        private bool _isAttemptingAuthentication;
 
         /// <summary>
         /// The connection to use being used for this database
@@ -143,26 +144,26 @@ namespace CSMongo {
         /// Returns a list of currently available cursors
         /// </summary>
         public IEnumerable<MongoCursor> Cursors {
-            get { return this._Cursors.AsEnumerable(); }
+            get { return _cursors.AsEnumerable(); }
         }
-        private List<MongoCursor> _Cursors;
+        private List<MongoCursor> _cursors;
 
         /// <summary>
         /// Checks if this connection has both a username and password provided
         /// </summary>
         public bool HasCredentials {
-            get { return !(string.IsNullOrEmpty(this.Username) && string.IsNullOrEmpty(this.Password)); }
+            get { return !(string.IsNullOrEmpty(Username) && string.IsNullOrEmpty(Password)); }
         }
 
         /// <summary>
         /// Returns access to a collection
         /// </summary>
         public MongoCollection this[string collection] {
-            get { return this.GetCollection(collection); }
+            get { return GetCollection(collection); }
         }
 
         //tracking changes
-        private Dictionary<string, MongoCollection> _Collections;
+        private Dictionary<string, MongoCollection> _collections;
 
         #endregion
 
@@ -172,14 +173,14 @@ namespace CSMongo {
         /// Starts a new query for a collection
         /// </summary>
         public MongoQuery From(string collection) {
-            return this.GetCollection(collection).Find();
+            return GetCollection(collection).Find();
         }
 
         /// <summary>
         /// Starts a new query for a collection
         /// </summary>
         public TQueryProvider From<TQueryProvider>(string collection) where TQueryProvider : MongoQueryBase {
-            return this.GetCollection(collection).Find<TQueryProvider>();
+            return GetCollection(collection).Find<TQueryProvider>();
         }
 
         #endregion
@@ -190,28 +191,28 @@ namespace CSMongo {
         /// Inserts a series of documents into the database
         /// </summary>
         public void Insert(string collection, object document) {
-            this.Insert(collection, (new MongoDocument[] { new MongoDocument(true, document) }).AsEnumerable());
+            Insert(collection, (new[] { new MongoDocument(true, document) }).AsEnumerable());
         }
 
         /// <summary>
         /// Inserts a series of documents into the database
         /// </summary>
         public void Insert(string collection, MongoDocument document) {
-            this.Insert(collection, (new MongoDocument[] { document }).AsEnumerable());
+            Insert(collection, (new[] { document }).AsEnumerable());
         }
 
         /// <summary>
         /// Inserts a series of documents into the database
         /// </summary>
         public void Insert(string collection, params object[] documents) {
-            this.Insert(collection, documents.AsEnumerable());
+            Insert(collection, documents.AsEnumerable());
         }
 
         /// <summary>
         /// Inserts a series of documents into the database
         /// </summary>
         public void Insert(string collection, params MongoDocument[] documents) {
-            this.Insert(collection, documents.AsEnumerable());
+            Insert(collection, documents.AsEnumerable());
         }
 
         /// <summary>
@@ -219,7 +220,7 @@ namespace CSMongo {
         /// </summary>
         public void Insert(string collection, IEnumerable<object> documents) {
             IEnumerable<MongoDocument> inserts = documents.Select(item => new MongoDocument(true, item));
-            this.Insert(collection, inserts);
+            Insert(collection, inserts);
         }
 
         /// <summary>
@@ -267,7 +268,7 @@ namespace CSMongo {
         /// Removes a collection based on the name
         /// </summary>
         public DropCollectionResult DropCollection(MongoCollection collection) {
-            return this.DropCollection(collection.Name);
+            return DropCollection(collection.Name);
         }
 
         /// <summary>
@@ -277,7 +278,7 @@ namespace CSMongo {
 
             //remove it from the list (if it is there)
             collection = (collection ?? string.Empty).Trim();
-            this._Collections.Remove(collection);
+            _collections.Remove(collection);
 
             //then send the command to remove it
             return MongoDatabaseCommands.DropCollection(this, collection);
@@ -344,21 +345,21 @@ namespace CSMongo {
         /// Manually invokes a command against the database
         /// </summary>
         public MethodResult RunCommand(object arguments) {
-            return this.RunCommand(new BsonObject(arguments));
+            return RunCommand(new BsonObject(arguments));
         }
 
         /// <summary>
         /// Manually invokes a command against the database
         /// </summary>
         public MethodResult RunCommand(object arguments, bool expectResponse) {
-            return this.RunCommand(new BsonObject(arguments), expectResponse);
+            return RunCommand(new BsonObject(arguments), expectResponse);
         }
 
         /// <summary>
         /// Manually invokes a command against the database
         /// </summary>
         public MethodResult RunCommand(BsonObject arguments) {
-            return this.RunCommand(arguments, true);
+            return RunCommand(arguments, true);
         }
 
         /// <summary>
@@ -379,8 +380,8 @@ namespace CSMongo {
         public ResponseBase SendRequest(RequestBase request) {
 
             //check if this person needs to authenticate
-            if (HasCredentials && !HasAuthenticated && !_IsAttemptingAuthentication) {
-                _IsAttemptingAuthentication = true;
+            if (HasCredentials && !HasAuthenticated && !_isAttemptingAuthentication) {
+                _isAttemptingAuthentication = true;
                 Authenticate();
             }
 
@@ -411,7 +412,7 @@ namespace CSMongo {
         /// Submits changes for all collections that have items queued
         /// </summary>
         public void SubmitChanges() {
-            foreach (var collection in _Collections.Values) {
+            foreach (var collection in _collections.Values) {
                 collection.SubmitChanges();
             }
         }
@@ -433,12 +434,12 @@ namespace CSMongo {
             }
 
             //check if this is already loaded
-            if (!this._Collections.ContainsKey(collection)) {
-                this._Collections.Add(collection, new MongoCollection(this, collection));
+            if (!_collections.ContainsKey(collection)) {
+                _collections.Add(collection, new MongoCollection(this, collection));
             }
 
             //return the collection
-            return this._Collections[collection];
+            return _collections[collection];
         }
 
         #endregion
@@ -449,32 +450,32 @@ namespace CSMongo {
         /// Authenticates to this database using the current username and password
         /// </summary>
         public void Authenticate() {
-            this.Authenticate(this.Username, this.Password);
+            Authenticate(Username, Password);
         }
 
         /// <summary>
         /// Authenticates this request with the provided username and password
         /// </summary>
         public void Authenticate(string username, string password) {
-            if (!this.HasCredentials) { return; }
+            if (!HasCredentials) { return; }
 
             //attempt to login for this user
             try {
-                this._IsAttemptingAuthentication = true;
-                this.Username = (username ?? string.Empty);
-                this.Password = (password ?? string.Empty);
+                _isAttemptingAuthentication = true;
+                Username = (username ?? string.Empty);
+                Password = (password ?? string.Empty);
 
                 //handle logging into the database
-                MethodResult result = MongoDatabaseCommands.Authenticate(this, this.Username, this.Password);
-                this.HasAuthenticated = result.Ok;
+                MethodResult result = MongoDatabaseCommands.Authenticate(this, Username, Password);
+                HasAuthenticated = result.Ok;
             }
             //thanks Ryan Farley
             catch (Exception up) {
-                throw up;
+                throw;
             }
             //make sure to note that we finished our attempt
             finally {
-                this._IsAttemptingAuthentication = false;
+                _isAttemptingAuthentication = false;
             }
             
         }
@@ -500,33 +501,33 @@ namespace CSMongo {
         public MongoCursor GetLastCursor() {
 
             //if there aren't any cursors throw an error
-            if (this._Cursors.Count == 0) {
+            if (_cursors.Count == 0) {
                 throw new NoCursorsFoundException();
             }
 
             //return the most recently added item
-            return this._Cursors.LastOrDefault();
+            return _cursors.LastOrDefault();
         }
 
         /// <summary>
         /// Gets more documents from the most recently added cursor
         /// </summary>
         public IEnumerable<MongoDocument> GetMore() {
-            return this.GetMore(this.GetLastCursor());
+            return GetMore(GetLastCursor());
         }
 
         /// <summary>
         /// Gets more documents from the most recently added cursor
         /// </summary>
         public IEnumerable<MongoDocument> GetMore(int count) {
-            return this.GetMore(this.GetLastCursor(), count);
+            return GetMore(GetLastCursor(), count);
         }
 
         /// <summary>
         /// Gets more documents from the provided MongoCursor
         /// </summary>
         public IEnumerable<MongoDocument> GetMore(MongoCursor cursor) {
-            return this.GetMore(cursor, -1);
+            return GetMore(cursor, -1);
         }
 
         /// <summary>
@@ -540,14 +541,14 @@ namespace CSMongo {
             }
 
             //start with the cursor value
-            int take = Mongo.DefaultGetMoreReturnCount;
+            var take = Mongo.DefaultGetMoreReturnCount;
 
             //if there is a defined count, use it
             if (count > 0) {
                 take = count;
             }
             //check for a manual take amount
-            else if (cursor.Query is QueryRequest && cursor.Query.Take > 0) {
+            else if (cursor.Query != null && cursor.Query.Take > 0) {
                 take = cursor.Query.Take;
             }
             //finally, use the return count if nothing
@@ -559,7 +560,7 @@ namespace CSMongo {
 
             //if there is a cursor, use it
             RequestBase request;
-            MongoCollection collection = this.GetCollection(cursor.Query.Collection);
+            var collection = GetCollection(cursor.Query.Collection);
             if (cursor.HasCursor) {
                 request = new GetMoreRequest(collection, cursor, take);
             }
@@ -572,7 +573,7 @@ namespace CSMongo {
             }
 
             //select any records we can find
-            QueryResponse response = this.SendRequest(request) as QueryResponse;
+            var response = SendRequest(request) as QueryResponse;
 
             //make sure something was found
             if (response == null) {
@@ -591,15 +592,15 @@ namespace CSMongo {
         /// </summary>
         public void RegisterCursor(MongoCursor cursor) {
             if (cursor == null) { return; }
-            this._Cursors.Add(cursor);
+            _cursors.Add(cursor);
         }
 
         /// <summary>
         /// Kills any available cursors to the database
         /// </summary>
         public void KillCursors() {
-            MongoDatabaseCommands.KillCursors(this, this._Cursors);
-            this._Cursors = new List<MongoCursor>();
+            MongoDatabaseCommands.KillCursors(this, _cursors);
+            _cursors = new List<MongoCursor>();
         }
 
         #endregion
@@ -610,8 +611,8 @@ namespace CSMongo {
         /// Handles ensuring that a connection is cleaned up when finished
         /// </summary>
         public void Dispose() {
-            this.Disconnect();
-            this.Connection.Dispose();
+            Disconnect();
+            Connection.Dispose();
         }
 
         #endregion

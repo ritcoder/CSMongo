@@ -1,4 +1,13 @@
-﻿04/09/2011 -
+﻿Known issues:
+1. Sometimes, an endOfStream error occurs.
+
+05/16/2011 -
+1. Added readonly property. In this mode, query documents are not store for future updates. This makes reading of large data faster
+2. During select, if no value is given for "take", it defaults to int.MaxValue
+3. During select, getMore is called until all data is retrieved
+4. Minor code cleanup
+
+04/09/2011 -
 1. Added support for MapReduce. This is added to both MongoCollection and MongoQuery
 2. Added support for regex. Query.Match now works
 3. Added support for the group command
@@ -34,7 +43,7 @@ Test unset with collection updates. It might be broken
 
 
 Missing features
-1. aggregates
+[done]1. aggregates
 	- distinct
 	- count
 2. advanced queries

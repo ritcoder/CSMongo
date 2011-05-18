@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CSMongo.Requests;
-using System.IO;
+﻿using System.IO;
 using CSMongo.Types;
-using CSMongo.Exceptions;
-using CSMongo.Bson;
 
 namespace CSMongo.Responses {
 
@@ -31,8 +24,8 @@ namespace CSMongo.Responses {
         /// <summary>
         /// Creates a new response by reading the standard Mongo header stream
         /// </summary>
-        public ResponseBase(Stream response) {
-            this._ReadResponse(response);
+        protected ResponseBase(Stream response) {
+            ReadResponse(response);
         }
 
         #endregion
@@ -73,19 +66,19 @@ namespace CSMongo.Responses {
         #region Handling Errors
 
         //handles reading the stream content
-        private void _ReadResponse(Stream response) {
+        private void ReadResponse(Stream response) {
 
             //perform any reading as required
-            BinaryReader reader = new BinaryReader(response);
+            var reader = new BinaryReader(response);
 
             //read the header first
-            this.Length = reader.ReadInt32();
-            this.RequestId = reader.ReadInt32();
-            this.ResponseTo = reader.ReadInt32();
-            this.OpCode = (OpCodeTypes)reader.ReadInt32();
+            Length = reader.ReadInt32();
+            RequestId = reader.ReadInt32();
+            ResponseTo = reader.ReadInt32();
+            OpCode = (OpCodeTypes)reader.ReadInt32();
 
             //next, call the reading for the body of the content
-            this.ParseStream(response);
+            ParseStream(response);
 
         }
 
