@@ -74,7 +74,7 @@ namespace CSMongo.Query {
 
             //if using a modifier, set this as a document
             if (modifier != null) {
-                var parameters = new BsonDocument();
+                var parameters = _parameters.Has(field) ? (BsonDocument) _parameters[field] : new BsonDocument();
                 parameters[modifier] = value;
                 _parameters[field] = parameters;
             }

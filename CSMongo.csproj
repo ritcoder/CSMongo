@@ -135,6 +135,7 @@
     <Compile Include="Responses\QueryResponse.cs" />
     <Compile Include="Responses\ResponseBase.cs" />
     <Compile Include="Results\ProfileResult.cs" />
+    <Compile Include="Tests.cs" />
     <Compile Include="Types\FindAndModifyParameters.cs" />
     <Compile Include="Types\MapReduceParameters.cs" />
     <Compile Include="Types\MongoBinaryTypes.cs" />

@@ -1,0 +1,42 @@
+<Configuration>
+  <SettingsComponent>
+    <string />
+    <integer />
+    <boolean>
+      <setting name="SolutionAnalysisEnabled">False</setting>
+    </boolean>
+  </SettingsComponent>
+  <CompletionStatisticsManager>
+    <ItemStatistics item="Default">
+      <Item value="document" priority="0" />
+      <Item value="Mongo`0" priority="0" />
+      <Item value="UpsertOnSubmit`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:CSMongo.MongoDocument">
+      <Item value="Has`1" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@CSMongo.Mongo">
+      <Item value="UpsertKey" priority="0" />
+    </ItemStatistics>
+  </CompletionStatisticsManager>
+  <RecentFiles>
+    <RecentFiles>
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/f:MongoCollection.cs" caret="5862" fromTop="14" />
+    </RecentFiles>
+    <RecentEdits>
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/f:MongoCollection.cs" caret="5771" fromTop="12" />
+      <File id="9D735EF9-E082-4646-A0C5-E794074BAA8B/f:MongoCollection.cs" caret="5862" fromTop="14" />
+    </RecentEdits>
+  </RecentFiles>
+  <NAntValidationSettings>
+    <NAntPath value="" />
+  </NAntValidationSettings>
+  <UnitTestRunner>
+    <Providers />
+  </UnitTestRunner>
+  <UnitTestRunnerNUnit>
+    <NUnitInstallDir IsNull="False">
+    </NUnitInstallDir>
+    <UseAddins>Never</UseAddins>
+  </UnitTestRunnerNUnit>
+</Configuration>
